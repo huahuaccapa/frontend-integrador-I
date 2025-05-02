@@ -113,18 +113,7 @@ export default function Example() {
               </>
             ) : (
               <div className="flex space-x-4">
-               <Link
-                    to="/general/login" // Cambia esto
-                    className="rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
-                  >
-                    Iniciar sesión
-                  </Link>
-                <Link
-                  to="/general/register" // Puedes añadir también la ruta de registro
-                  className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
-                >
-                  Registrarse
-                </Link>
+               
               </div>
             )}
           </div>
