@@ -2,8 +2,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import DashboardLayout from '@/routes/dashboardlayout';
 import { TableDemo } from './pages/panels/Administrador/Cliente/Components/TablesDemo';
-import Login from './pages/general/login/Login'; // ✅ Ruta corregida
-
+import Login from './pages/general/login/Login'; 
 function App() {
   return (
     <Router>
