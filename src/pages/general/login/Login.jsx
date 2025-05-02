@@ -1,9 +1,9 @@
-// Login.jsx
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 // Esquema de validación con Zod
 const loginSchema = z.object({
@@ -22,16 +22,45 @@ const Login = () => {
     resolver: zodResolver(loginSchema),
   });
 
-  const onSubmit = (data) => {
-    console.log('Datos ingresados:', data);
-    // Simulamos que el login es exitoso
-    navigate('/dashboard/Clientes'); // Redirige al dashboard después del login
+  const onSubmit = async (data) => {
+    try {
+      const response = await axios.post(
+        'http://localhost:8080/api/auth/login',
+        {
+          username: data.username,
+          password: data.password,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          responseType: 'text', // el backend responde con texto plano
+        }
+      );
+
+      const role = response.data;
+
+      if (role === 'ADMIN' || role === 'EMPLEADO') {
+        localStorage.setItem('userRole', role);
+
+        if (role === 'ADMIN') {
+          navigate('/dashboard/clientes');
+        } else {
+          navigate('/dashboard/verclientes');
+        }
+      } else {
+        alert('Credenciales incorrectas');
+      }
+    } catch (error) {
+      console.error('Error de login:', error);
+      alert('Error de conexión con el servidor');
+    }
   };
 
   return (
     <div className="flex min-h-screen bg-black">
       {/* Columna de la imagen */}
-      <div className="p-30 w-1/2 hidden md:block ">
+      <div className="p-30 w-1/2 hidden md:block">
         <img
           src="https://www.muvit.es/img/cms/1%20-%20Blog/Conjunto%20de%20accesorios%20blancos.jpeg"
           alt="Imagen de login"
