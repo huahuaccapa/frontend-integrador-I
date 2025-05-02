@@ -1,8 +1,8 @@
-// src/App.jsx
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import DashboardLayout from '@/routes/dashboardlayout';
-import { TableDemo } from './pages/panels/Administrador/Cliente/Components/TablesDemo';
+import { Clientes } from './pages/panels/Administrador/Cliente/Clientes'; // Cambiado de TableDemo a Clientes
 import Login from './pages/general/login/Login'; 
+
 function App() {
   return (
     <Router>
@@ -12,7 +12,7 @@ function App() {
 
         {/* Rutas protegidas dentro del dashboard */}
         <Route path="/dashboard" element={<DashboardLayout />}>
-          <Route path="clientes" element={<TableDemo />} />
+          <Route path="clientes" element={<Clientes />} /> {/* Ahora usa Clientes en lugar de TableDemo */}
           {/* Agrega más rutas aquí si deseas */}
         </Route>
       </Routes>
