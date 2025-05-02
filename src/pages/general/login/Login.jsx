@@ -1,7 +1,9 @@
+// Login.jsx
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useNavigate } from 'react-router-dom';
 
 // Esquema de validación con Zod
 const loginSchema = z.object({
@@ -10,6 +12,8 @@ const loginSchema = z.object({
 });
 
 const Login = () => {
+  const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
@@ -19,7 +23,9 @@ const Login = () => {
   });
 
   const onSubmit = (data) => {
-    console.log(data);
+    console.log('Datos ingresados:', data);
+    // Simulamos que el login es exitoso
+    navigate('/dashboard/Clientes'); // Redirige al dashboard después del login
   };
 
   return (
@@ -27,7 +33,7 @@ const Login = () => {
       {/* Columna de la imagen */}
       <div className="p-30 w-1/2 hidden md:block ">
         <img
-          src="https://www.muvit.es/img/cms/1%20-%20Blog/Conjunto%20de%20accesorios%20blancos.jpeg" // Reemplaza con la URL de tu imagen
+          src="https://www.muvit.es/img/cms/1%20-%20Blog/Conjunto%20de%20accesorios%20blancos.jpeg"
           alt="Imagen de login"
           className="object-cover w-full h-full rounded-lg"
         />
