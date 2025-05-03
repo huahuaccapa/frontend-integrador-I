@@ -5,7 +5,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-// Esquema de validación con Zod
 const loginSchema = z.object({
   username: z.string().min(3, 'El nombre de usuario debe tener al menos 3 caracteres'),
   password: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres'),
@@ -34,7 +33,7 @@ const Login = () => {
           headers: {
             'Content-Type': 'application/json',
           },
-          responseType: 'text', // el backend responde con texto plano
+          responseType: 'text',
         }
       );
 
@@ -42,12 +41,7 @@ const Login = () => {
 
       if (role === 'ADMIN' || role === 'EMPLEADO') {
         localStorage.setItem('userRole', role);
-
-        if (role === 'ADMIN') {
-          navigate('/dashboard/clientes');
-        } else {
-          navigate('/dashboard/verclientes');
-        }
+        navigate('/dashboard'); // Solo este cambio: redirige a /dashboard
       } else {
         alert('Credenciales incorrectas');
       }
@@ -59,7 +53,6 @@ const Login = () => {
 
   return (
     <div className="flex min-h-screen bg-black">
-      {/* Columna de la imagen */}
       <div className="p-30 w-1/2 hidden md:block">
         <img
           src="https://www.muvit.es/img/cms/1%20-%20Blog/Conjunto%20de%20accesorios%20blancos.jpeg"
@@ -68,7 +61,6 @@ const Login = () => {
         />
       </div>
 
-      {/* Columna del formulario */}
       <div className="w-full md:w-1/2 flex justify-center items-center">
         <div className="w-full max-w-sm p-6 bg-gray-900 rounded-lg shadow-lg">
           <h2 className="text-2xl font-bold text-center text-white mb-6">Iniciar sesión</h2>
