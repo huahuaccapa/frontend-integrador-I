@@ -1,56 +1,54 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080/api',
+  baseURL: 'http://localhost:8080/api',
   headers: {
     'Content-Type': 'application/json',
-    'Accept': 'application/json'
+    'Accept': 'application/json',
+    'X-Requested-With': 'XMLHttpRequest'
   },
-  timeout: 10000, // 10 segundos de timeout
+  timeout: 10000
 });
 
-// Interceptor para autenticación
+// Interceptor de solicitud
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    console.log(`Enviando ${config.method?.toUpperCase()} a ${config.url}`);
     return config;
   },
   (error) => {
+    console.error('Error en interceptor de solicitud:', error);
     return Promise.reject(error);
   }
 );
 
-// Interceptor para manejo global de errores
+// Interceptor de respuesta
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log('Respuesta recibida:', {
+      status: response.status,
+      from: response.config.url
+    });
+    return response;
+  },
   (error) => {
-    if (error.response) {
-      switch (error.response.status) {
-        case 401:
-          console.error('No autorizado - Redirigir a login');
-          localStorage.removeItem('token');
-          window.location.href = '/login';
-          break;
-        case 403:
-          console.error('Acceso prohibido');
-          break;
-        case 404:
-          console.error('Recurso no encontrado');
-          break;
-        case 500:
-          console.error('Error del servidor');
-          break;
-        default:
-          console.error('Error desconocido:', error);
-      }
-    } else if (error.request) {
-      console.error('No se recibió respuesta del servidor');
-    } else {
-      console.error('Error al configurar la petición:', error.message);
+    const errorInfo = {
+      url: error.config?.url,
+      status: error.response?.status,
+      message: error.message
+    };
+    console.error('Error en respuesta:', errorInfo);
+
+    if (error.code === 'ECONNABORTED') {
+      error.message = 'El servidor no respondió a tiempo';
+    } else if (!error.response) {
+      error.message = `No se pudo conectar al servidor (${error.config?.url})`;
     }
+
     return Promise.reject(error);
   }
 );
