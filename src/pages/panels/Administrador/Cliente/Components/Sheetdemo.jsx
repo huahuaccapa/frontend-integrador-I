@@ -9,6 +9,12 @@ import {
 import { FormCliente } from "./FormCliente";
 
 export function SheetDemo({ onClienteAdded }) {
+  const isAdmin = localStorage.getItem('userRole') === 'ADMIN';
+
+  if (!isAdmin) {
+    return null; // No renderiza nada si no es admin
+  }
+
   return (
     <Sheet>
       <SheetTrigger asChild>
