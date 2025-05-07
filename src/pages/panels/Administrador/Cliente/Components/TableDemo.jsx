@@ -8,7 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import api from "@/api/axios";
+import axios from 'axios';
 import { useForm } from "react-hook-form";
 import {
   Dialog,
@@ -29,7 +29,7 @@ export function TableDemo({ clientes, onClienteDeleted }) {
       const confirmar = window.confirm("¿Estás seguro de eliminar este cliente?");
       if (!confirmar) return;
       
-      await api.delete(`/clientes/${id}`);
+      await axios.delete(`http://localhost:8080/api/clientes/${id}`);
       onClienteDeleted();
       toast({
         title: "Éxito",
@@ -91,7 +91,7 @@ export function TableDemo({ clientes, onClienteDeleted }) {
 }
 
 function EditClienteDialog({ cliente, onClienteUpdated }) {
-  const { register, handleSubmit,  formState: { errors } } = useForm({
+  const { register, handleSubmit, formState: { errors } } = useForm({
     defaultValues: {
       nombre: cliente.nombre,
       apellidos: cliente.apellidos,
@@ -103,8 +103,7 @@ function EditClienteDialog({ cliente, onClienteUpdated }) {
 
   const onSubmit = async (data) => {
     try {
-      console.log("Actualizando cliente:", data);
-      const response = await api.put(`/clientes/${cliente.id}`, {
+      const response = await axios.put(`http://localhost:8080/api/clientes/${cliente.id}`, {
         nombre: data.nombre,
         apellidos: data.apellidos || "",
         email: data.email,
@@ -140,7 +139,6 @@ function EditClienteDialog({ cliente, onClienteUpdated }) {
           <DialogTitle>Editar Cliente</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 py-4">
-          {/* Campo Nombre */}
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="nombre" className="text-right">
               Nombre*
@@ -157,7 +155,6 @@ function EditClienteDialog({ cliente, onClienteUpdated }) {
             )}
           </div>
 
-          {/* Campo Apellidos */}
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="apellidos" className="text-right">
               Apellidos
@@ -169,7 +166,6 @@ function EditClienteDialog({ cliente, onClienteUpdated }) {
             />
           </div>
           
-          {/* Campo Email */}
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="email" className="text-right">
               Email*
@@ -193,7 +189,6 @@ function EditClienteDialog({ cliente, onClienteUpdated }) {
             )}
           </div>
           
-          {/* Campo Teléfono */}
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="telefono" className="text-right">
               Teléfono
@@ -206,7 +201,6 @@ function EditClienteDialog({ cliente, onClienteUpdated }) {
             />
           </div>
 
-          {/* Campo RUC/DNI */}
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="identificacion" className="text-right">
               RUC/DNI
@@ -218,7 +212,6 @@ function EditClienteDialog({ cliente, onClienteUpdated }) {
             />
           </div>
           
-          {/* Botón de Submit */}
           <div className="flex justify-end mt-4">
             <Button type="submit">
               Guardar Cambios
