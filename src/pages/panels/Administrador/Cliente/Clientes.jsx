@@ -12,6 +12,10 @@ export function Clientes() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  
+  const isAdmin = localStorage.getItem('userRole') === 'ADMIN';
+
+
 
   const fetchClientes = async () => {
     setLoading(true);
@@ -55,7 +59,7 @@ export function Clientes() {
   return (
     <div className="p-4">
       <div className="flex justify-between items-center mb-4">
-        <SheetDemo onClienteAdded={fetchClientes} />
+      {isAdmin && <SheetDemo onClienteAdded={fetchClientes} />}
         <Input
           type="text"
           placeholder="Buscar clientes..."
