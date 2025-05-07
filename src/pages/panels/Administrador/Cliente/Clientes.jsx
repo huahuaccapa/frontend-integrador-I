@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { TableDemo } from './Components/TableDemo';
 import { SheetDemo } from './Components/SheetDemo';
-import api from "@/api/axios";
+import axios from 'axios';
 import { Toaster } from "@/components/ui/toaster";
 import { toast } from "@/components/ui/use-toast";
 import { Input } from "@/components/ui/input";
@@ -17,24 +17,15 @@ export function Clientes() {
     setLoading(true);
     setError(null);
     try {
-      console.log("Obteniendo lista de clientes...");
-      const response = await api.get('/clientes');
-      
-      if (response.data && response.data.length > 0) {
-        console.log("Clientes recibidos:", response.data);
-        setClientes(response.data);
-        setFilteredClientes(response.data);
-      } else {
-        console.warn("La respuesta no contiene datos");
-        setClientes([]);
-        setFilteredClientes([]);
-      }
+      const response = await axios.get('http://localhost:8080/api/clientes');
+      setClientes(response.data);
+      setFilteredClientes(response.data);
     } catch (error) {
       console.error("Error al obtener clientes:", error);
       setError("Error al cargar clientes");
       toast({
         title: "Error",
-        description: "No se pudo obtener la lista de clientes",
+        description: error.response?.data || "No se pudo obtener la lista de clientes",
         variant: "destructive"
       });
     } finally {
@@ -46,7 +37,6 @@ export function Clientes() {
     fetchClientes();
   }, []);
 
-  // Función para filtrar clientes
   useEffect(() => {
     if (searchTerm.trim() === '') {
       setFilteredClientes(clientes);
