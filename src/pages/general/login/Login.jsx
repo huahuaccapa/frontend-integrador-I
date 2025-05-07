@@ -33,7 +33,6 @@ const Login = () => {
           headers: {
             'Content-Type': 'application/json',
           },
-          responseType: 'text',
         }
       );
 
@@ -41,13 +40,13 @@ const Login = () => {
 
       if (role === 'ADMIN' || role === 'EMPLEADO') {
         localStorage.setItem('userRole', role);
-        navigate('/dashboard'); // Solo este cambio: redirige a /dashboard
+        navigate('/dashboard/clientes');
       } else {
         alert('Credenciales incorrectas');
       }
     } catch (error) {
       console.error('Error de login:', error);
-      alert('Error de conexión con el servidor');
+      alert(error.response?.data || 'Error de conexión con el servidor');
     }
   };
 
