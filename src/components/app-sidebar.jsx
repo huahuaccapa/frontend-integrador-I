@@ -23,7 +23,7 @@ export default function AppSidebar() {
           <SidebarItem icon={Home} title="Home" to="/dashboard" />
           <SidebarItem icon={User} title="Clientes" to="clientes" /> {/* Cambiado a ruta relativa */}
           <SidebarItem icon={Proportions} title="Reportes" />
-          <SidebarItem icon={ShoppingBag} title="Inventario" />
+          <SidebarItem icon={ShoppingBag} title="Inventario" to="inventario" />
           <SidebarItem icon={Handshake} title="Proveedores" />
           <SidebarItem icon={Store} title="Ventas" />
         </nav>
