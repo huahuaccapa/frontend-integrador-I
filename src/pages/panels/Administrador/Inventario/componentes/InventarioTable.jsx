@@ -1,4 +1,3 @@
-// components/Inventario/InventarioTable.jsx
 import React, { useState } from "react"
 import {
   flexRender,
@@ -28,7 +27,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
-export function InventarioTable({ data, onVer, onEditar, onEliminar  }) {
+export function InventarioTable({ data, onVer, onEditar, onEliminar, onAgregar }) { // Añadir onAgregar como prop
   const columns = getColumns(onVer, onEditar, onEliminar)
   const [sorting, setSorting] = useState([])
   const [columnFilters, setColumnFilters] = useState([])
@@ -40,27 +39,26 @@ export function InventarioTable({ data, onVer, onEditar, onEliminar  }) {
   })
 
 
- const table = useReactTable({
-  data,
-  columns,
-  state: {
-    sorting,
-    columnFilters,
-    columnVisibility,
-    rowSelection,
-    pagination, 
-  },
-  onSortingChange: setSorting,
-  onColumnFiltersChange: setColumnFilters,
-  onColumnVisibilityChange: setColumnVisibility,
-  onRowSelectionChange: setRowSelection,
-  onPaginationChange: setPagination,
-  getCoreRowModel: getCoreRowModel(),
-  getFilteredRowModel: getFilteredRowModel(),
-  getSortedRowModel: getSortedRowModel(),
-  getPaginationRowModel: getPaginationRowModel(), 
-})
-
+  const table = useReactTable({
+    data,
+    columns,
+    state: {
+      sorting,
+      columnFilters,
+      columnVisibility,
+      rowSelection,
+      pagination,
+    },
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
+    onPaginationChange: setPagination,
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+  })
 
   return (
     <>
@@ -74,7 +72,8 @@ export function InventarioTable({ data, onVer, onEditar, onEliminar  }) {
           className="max-w-sm"
         />
         <div className="p-4">
-           <Button>Agregar producto</Button>
+          {/* Botón para agregar productos */}
+          <Button onClick={onAgregar}>Agregar productos</Button> {/* Llamamos onAgregar al hacer click */}
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -138,7 +137,6 @@ export function InventarioTable({ data, onVer, onEditar, onEliminar  }) {
       </div>
 
       <div className="flex items-center justify-end space-x-2 py-4">
-        
         <div className="space-x-2">
           <Button
             variant="outline"
