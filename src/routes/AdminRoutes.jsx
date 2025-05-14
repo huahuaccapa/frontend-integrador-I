@@ -19,14 +19,7 @@ const adminRoutes = [
           { index: true, lazy: async () => ({ Component: (await import('../pages/panels/admin/dashboard/Dashboard')).default }) },
           { path: 'dashboard', lazy: async () => ({ Component: (await import('../pages/panels/admin/dashboard/Dashboard')).default }) },
           { path: 'programas', lazy: async () => ({ Component: (await import('../pages/panels/admin/programs/programs')).default }) },
-          { path: 'matriculas', lazy: async () => ({ Component: (await import('../pages/panels/admin/enrollments/enrollments')).default }) },
-          { path: 'evaluaciones', lazy: async () => ({ Component: (await import('../pages/panels/admin/exams/exams')).default }) },
-          { path: 'examcourse/:programId', lazy: async () => ({ Component: (await import('../pages/panels/admin/exams/examscourse')).default }) },
-          { path: 'profesores', lazy: async () => ({ Component: (await import('../pages/panels/admin/professors/professors')).default }) },
-          { path: 'estudiantes', lazy: async () => ({ Component: (await import('../pages/panels/admin/students/students')).default }) },
-          { path: 'construir/:programId', lazy: async () => ({ Component: (await import('../pages/panels/admin/modules/BuildProgram')).default }) },
-          { path: 'preguntas_frecuentes', lazy: async () => ({ Component: (await import('../pages/panels/admin/questions/questions')).default }) },
-          {
+         {
             path: 'ajustes',
             lazy: async () => ({ Component: (await import('../pages/general/settings')).default }),
             errorElement: <GeneralError />,

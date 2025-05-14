@@ -11,8 +11,10 @@ import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { Link, useNavigate } from 'react-router-dom'
 
 const navigation = [
+  {/*RUTAS PARA EL NAVBAR DE LA APLICACION*/},
   { name: 'Dashboard', href: '/dashboard' },
   { name: 'Clientes', href: '/dashboard/clientes' },
+  {name: 'Inventario', href: '/dashboard/inventario'},
   { name: 'Reportes', href: '/reportes' },
   { name: 'Ventas', href: '/ventas' },
 ]
