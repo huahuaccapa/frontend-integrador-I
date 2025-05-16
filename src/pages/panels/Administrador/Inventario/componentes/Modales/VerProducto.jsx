@@ -1,3 +1,4 @@
+//src\pages\panels\Administrador\Inventario\componentes\Modales\VerProducto.jsx
 export function VistaProducto({ producto }) {
   return (
     <div className="space-y-2">
