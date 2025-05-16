@@ -67,9 +67,9 @@ export function InventarioTable({ data, onVer, onEditar, onEliminar  }) {
       <div className="flex items-center py-4">
         <Input
           placeholder="Filtrar por producto..."
-          value={table.getColumn("producto")?.getFilterValue() ?? ""}
+          value={table.getColumn("nombreProducto")?.getFilterValue() ?? ""}
           onChange={(e) =>
-            table.getColumn("producto")?.setFilterValue(e.target.value)
+            table.getColumn("nombreProducto")?.setFilterValue(e.target.value)
           }
           className="max-w-sm"
         />

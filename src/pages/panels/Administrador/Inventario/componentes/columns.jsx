@@ -27,33 +27,29 @@ export function getColumns(onVer, onEditar, onEliminar) {
   return [
  
   
-  {
-    accessorKey: "producto",
-    cell: ({ row }) => (
-      <div className="lowercase">{row.getValue("producto")}</div>
-    ),
+   {
+    accessorKey: "id",
+    header: "ID",
   },
+
+ {
+    accessorKey: "nombreProducto",
+    header: "Nombre Producto",
+  },
+
+   {
+    accessorKey: "tipoProducto",
+    header: "Tipo de Producto",
+    
+  },  
+  
   {
-    accessorKey: "estado",
+    accessorKey: "estadoStock",
     header: "Estado",
-    cell: ({ row }) => {
-      const estado = row.getValue("estado")
-      const estadoLabel = estado === "activo" ? "Activo" : "Inactivo"
-      const estadoColor =
-        estado === "activo"
-          ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
-          : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
-
-      return (
-        <span
-          className={`text-xs font-medium px-2.5 py-0.5 rounded ${estadoColor}`}
-        >
-          {estadoLabel}
-        </span>
-      )
-    },
+    
   },
 
+  
   {
     accessorKey: "stock",
     header: () => <div className="text-center">Stock</div>,
