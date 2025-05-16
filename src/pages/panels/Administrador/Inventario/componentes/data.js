@@ -1,4 +1,4 @@
-// components/Inventario/data.js
+//src\pages\panels\Administrador\Inventario\componentes\data.js
 export const data = [
   {
     id: "m5gr84i9",
