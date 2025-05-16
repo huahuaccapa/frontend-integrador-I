@@ -1,6 +1,5 @@
-// components/ProductoModal.jsx
-import React from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import React from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export function ProductoModal({ open, onOpenChange, title, children }) {
   return (
@@ -12,5 +11,5 @@ export function ProductoModal({ open, onOpenChange, title, children }) {
         {children}
       </DialogContent>
     </Dialog>
-  )
+  );
 }
