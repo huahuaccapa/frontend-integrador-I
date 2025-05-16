@@ -1,4 +1,4 @@
-// componentes/ContenidoProductoModal.jsx
+//src\pages\panels\Administrador\Inventario\componentes\Modales\ContenidoModal.jsx
 import React from "react"
 
 export function ContenidoProductoModal({ producto, tipo }) {
