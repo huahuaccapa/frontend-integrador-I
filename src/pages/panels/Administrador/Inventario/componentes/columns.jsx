@@ -1,4 +1,4 @@
-// components/Inventario/columns.js
+// src\pages\panels\Administrador\Inventario\componentes\columns.jsx
 
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
