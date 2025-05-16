@@ -3,12 +3,20 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export function CardWithForm({ producto, onGuardar }) {
   const [nombre, setNombre] = useState(producto.nombreProducto || producto.producto || "");
   const [precio, setPrecio] = useState(producto.precio || "");
   const [stock, setStock] = useState(producto.stock || 0);
-  const [estado, setEstado] = useState(producto.estadoStock || producto.estado || "activo");
+  const [estado, setEstado] = useState(producto.estadoStock || producto.estado || "OPTIMO");
+  const [tipo, setTipo] = useState(producto.tipoProducto || "ACCESORIO");
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -18,6 +26,8 @@ export function CardWithForm({ producto, onGuardar }) {
       precio: parseFloat(precio),
       stock: parseInt(stock),
       estadoStock: estado,
+      tipoProducto: tipo,
+      estado: estado // Mantener ambos por compatibilidad
     };
 
     onGuardar(productoEditado);
@@ -31,25 +41,56 @@ export function CardWithForm({ producto, onGuardar }) {
       <CardContent>
         <form onSubmit={handleSubmit} className="grid gap-4">
           <div>
-            <Label>Nombre</Label>
-            <Input value={nombre} onChange={(e) => setNombre(e.target.value)} />
+            <Label>Nombre del Producto</Label>
+            <Input 
+              value={nombre} 
+              onChange={(e) => setNombre(e.target.value)}
+              required
+            />
           </div>
           <div>
             <Label>Precio</Label>
-            <Input type="number" value={precio} onChange={(e) => setPrecio(e.target.value)} />
+            <Input 
+              type="number" 
+              step="0.01" 
+              value={precio} 
+              onChange={(e) => setPrecio(e.target.value)}
+              required
+            />
           </div>
           <div>
             <Label>Stock</Label>
-            <Input type="number" value={stock} onChange={(e) => setStock(e.target.value)} />
+            <Input 
+              type="number" 
+              value={stock} 
+              onChange={(e) => setStock(e.target.value)}
+              required
+            />
           </div>
           <div>
-            
-            <Label>Estado</Label>
-            <select value={estado} onChange={(e) => setEstado(e.target.value)} className="w-full p-2 border rounded">
-              <option value="OPTIMO">Optimo</option>
-              <option value="MEDIO">Medio</option>
-              <option value="BAJO">Bajo</option>
-            </select>
+            <Label>Tipo de Producto</Label>
+            <Select value={tipo} onValueChange={setTipo}>
+              <SelectTrigger>
+                <SelectValue placeholder="Selecciona un tipo" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ACCESORIO">Accesorio</SelectItem>
+                <SelectItem value="REPUESTO">Repuesto</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label>Estado del Stock</Label>
+            <Select value={estado} onValueChange={setEstado}>
+              <SelectTrigger>
+                <SelectValue placeholder="Selecciona un estado" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="OPTIMO">Óptimo</SelectItem>
+                <SelectItem value="MEDIO">Medio</SelectItem>
+                <SelectItem value="BAJO">Bajo</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </form>
       </CardContent>
