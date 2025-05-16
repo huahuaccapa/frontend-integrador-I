@@ -1,5 +1,4 @@
-// components/Inventario/InventarioTable.jsx
-import React, { useState } from "react"
+import React, { useState } from "react";
 import {
   flexRender,
   getCoreRowModel,
@@ -7,18 +6,17 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-} from "@tanstack/react-table"
-
-import { getColumns } from "./columns"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
+} from "@tanstack/react-table";
+import { getColumns } from "./columns";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { ChevronDown } from "lucide-react"
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -26,41 +24,39 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
 
-export function InventarioTable({ data, onVer, onEditar, onEliminar  }) {
-  const columns = getColumns(onVer, onEditar, onEliminar)
-  const [sorting, setSorting] = useState([])
-  const [columnFilters, setColumnFilters] = useState([])
-  const [columnVisibility, setColumnVisibility] = useState({})
-  const [rowSelection, setRowSelection] = useState({})
+export function InventarioTable({ data, onVer, onEditar, onEliminar, onCrear }) {
+  const columns = getColumns(onVer, onEditar, onEliminar);
+  const [sorting, setSorting] = useState([]);
+  const [columnFilters, setColumnFilters] = useState([]);
+  const [columnVisibility, setColumnVisibility] = useState({});
+  const [rowSelection, setRowSelection] = useState({});
   const [pagination, setPagination] = useState({
     pageIndex: 0,
-    pageSize: 4, // o 10 o lo que prefieras
-  })
+    pageSize: 4,
+  });
 
-
- const table = useReactTable({
-  data,
-  columns,
-  state: {
-    sorting,
-    columnFilters,
-    columnVisibility,
-    rowSelection,
-    pagination, 
-  },
-  onSortingChange: setSorting,
-  onColumnFiltersChange: setColumnFilters,
-  onColumnVisibilityChange: setColumnVisibility,
-  onRowSelectionChange: setRowSelection,
-  onPaginationChange: setPagination,
-  getCoreRowModel: getCoreRowModel(),
-  getFilteredRowModel: getFilteredRowModel(),
-  getSortedRowModel: getSortedRowModel(),
-  getPaginationRowModel: getPaginationRowModel(), 
-})
-
+  const table = useReactTable({
+    data,
+    columns,
+    state: {
+      sorting,
+      columnFilters,
+      columnVisibility,
+      rowSelection,
+      pagination,
+    },
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
+    onPaginationChange: setPagination,
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+  });
 
   return (
     <>
@@ -74,7 +70,7 @@ export function InventarioTable({ data, onVer, onEditar, onEliminar  }) {
           className="max-w-sm"
         />
         <div className="p-4">
-           <Button>Agregar producto</Button>
+          <Button onClick={onCrear}>Agregar producto</Button>
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -109,7 +105,10 @@ export function InventarioTable({ data, onVer, onEditar, onEliminar  }) {
                   <TableHead key={header.id}>
                     {header.isPlaceholder
                       ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                   </TableHead>
                 ))}
               </TableRow>
@@ -128,7 +127,10 @@ export function InventarioTable({ data, onVer, onEditar, onEliminar  }) {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="text-center h-24">
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
                   Sin resultados.
                 </TableCell>
               </TableRow>
@@ -138,7 +140,6 @@ export function InventarioTable({ data, onVer, onEditar, onEliminar  }) {
       </div>
 
       <div className="flex items-center justify-end space-x-2 py-4">
-        
         <div className="space-x-2">
           <Button
             variant="outline"
@@ -159,5 +160,5 @@ export function InventarioTable({ data, onVer, onEditar, onEliminar  }) {
         </div>
       </div>
     </>
-  )
+  );
 }
