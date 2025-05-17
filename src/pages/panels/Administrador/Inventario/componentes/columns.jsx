@@ -1,124 +1,116 @@
-// src\pages\panels\Administrador\Inventario\componentes\columns.jsx
-
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Eye, Pencil, Trash, AlertTriangle, ArrowUpDown } from "lucide-react"
+import { Button } from "@/components/ui/button";
+import { Eye, Pencil, Trash, AlertTriangle } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip"
-
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
-
+} from "@/components/ui/tooltip";
+import { Badge } from "@/components/ui/badge";
 
 export function getColumns(onVer, onEditar, onEliminar) {
   return [
- 
-  
-   {
-    accessorKey: "id",
-    header: "ID",
-  },
-
- {
-    accessorKey: "nombreProducto",
-    header: "Nombre Producto",
-  },
-
-   {
-    accessorKey: "tipoProducto",
-    header: "Tipo de Producto",
-    
-  },  
-  
-  {
-    accessorKey: "estadoStock",
-    header: "Estado",
-    
-  },
-
-  
-  {
-    accessorKey: "stock",
-    header: () => <div className="text-center">Stock</div>,
-    cell: ({ row }) => {
-      const stock = row.getValue("stock")
-      const isLow = stock <= 5
-
-      if (isLow) {
+    {
+      accessorKey: "id",
+      header: "ID",
+    },
+    {
+      accessorKey: "nombreProducto",
+      header: "Nombre",
+    },
+    {
+      accessorKey: "tipoProducto",
+      header: "Tipo",
+      cell: ({ row }) => (
+        <Badge variant="outline" className="capitalize">
+          {row.getValue("tipoProducto")?.toLowerCase() || 'N/A'}
+        </Badge>
+      ),
+    },
+    {
+      accessorKey: "estadoStock",
+      header: "Estado",
+      cell: ({ row }) => {
+        const estado = row.getValue("estadoStock");
+        let variant;
+        switch(estado) {
+          case 'OPTIMO': variant = 'default'; break;
+          case 'MEDIO': variant = 'secondary'; break;
+          case 'BAJO': variant = 'destructive'; break;
+          default: variant = 'outline';
+        }
         return (
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="flex items-center justify-center gap-1 text-red-600 font-semibold">
-                  {stock}
-                  <AlertTriangle className="h-4 w-4" />
-                </div>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Stock bajo</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        )
-      }
-
-      return (
-        <div className="text-center text-green-700">
-          {stock}
-        </div>
-      )
+          <Badge variant={variant} className="capitalize">
+            {estado?.toLowerCase() || 'N/A'}
+          </Badge>
+        );
+      },
     },
-  },
+    {
+      accessorKey: "stock",
+      header: () => <div className="text-center">Stock</div>,
+      cell: ({ row }) => {
+        const stock = row.getValue("stock");
+        const isLow = stock <= 5;
 
-
-  {
-    accessorKey: "precio",
-    header: () => <div className="text-right">Precio</div>,
-    cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("precio"))
-      const formatted = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-      }).format(amount)
-
-      return <div className="text-right font-medium">{formatted}</div>
+        return (
+          <div className={`text-center font-medium ${
+            isLow ? 'text-red-600' : 'text-green-600'
+          }`}>
+            {stock}
+            {isLow && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <AlertTriangle className="h-4 w-4 inline-block ml-1" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Stock bajo</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+          </div>
+        );
+      },
     },
-  },
-   {
+    {
+      accessorKey: "precio",
+      header: () => <div className="text-right">Precio</div>,
+      cell: ({ row }) => {
+        const amount = parseFloat(row.getValue("precio"));
+        const formatted = new Intl.NumberFormat("es-PE", {
+          style: "currency",
+          currency: "PEN",
+        }).format(amount);
+
+        return <div className="text-right font-medium">{formatted}</div>;
+      },
+    },
+    {
       id: "actions",
       enableHiding: false,
       header: () => <div className="text-center">Acciones</div>,
       cell: ({ row }) => {
-        const producto = row.original
+        const producto = row.original;
 
         return (
-          <div className="flex justify-center items-center gap-2">
+          <div className="flex justify-center gap-2">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
                     size="icon"
                     variant="ghost"
-                    className="text-blue-600"
+                    className="hover:bg-blue-50 hover:text-blue-600"
                     onClick={() => onVer(producto)}
                   >
                     <Eye className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>Ver</TooltipContent>
+                <TooltipContent>
+                  <p>Ver detalles</p>
+                </TooltipContent>
               </Tooltip>
 
               <Tooltip>
@@ -126,47 +118,36 @@ export function getColumns(onVer, onEditar, onEliminar) {
                   <Button
                     size="icon"
                     variant="ghost"
-                    className="text-yellow-500"
+                    className="hover:bg-yellow-50 hover:text-yellow-600"
                     onClick={() => onEditar(producto)}
                   >
                     <Pencil className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>Editar</TooltipContent>
+                <TooltipContent>
+                  <p>Editar</p>
+                </TooltipContent>
               </Tooltip>
 
-              <AlertDialog>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <AlertDialogTrigger asChild>
-                      <Button size="icon" variant="ghost">
-                        <Trash className="h-4 w-4 text-red-600" />
-                      </Button>
-                    </AlertDialogTrigger>
-                  </TooltipTrigger>
-                  <TooltipContent>Eliminar</TooltipContent>
-                </Tooltip>
-
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Esta acción no se puede deshacer. Esto eliminará
-                      permanentemente el producto <strong>{producto.producto}</strong>.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                    <AlertDialogAction onClick={() => onEliminar(producto)}>
-                      Eliminar
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="hover:bg-red-50 hover:text-red-600"
+                    onClick={() => onEliminar(producto)}
+                  >
+                    <Trash className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Eliminar</p>
+                </TooltipContent>
+              </Tooltip>
             </TooltipProvider>
           </div>
-        )
+        );
       },
     },
-]
+  ];
 }
