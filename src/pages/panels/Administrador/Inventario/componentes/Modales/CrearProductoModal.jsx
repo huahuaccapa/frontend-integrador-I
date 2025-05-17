@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Card,
   CardHeader,
@@ -16,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useToast } from "@/components/ui/use-toast";
 
 export function CrearProductoModal({ onGuardar }) {
   const [nombre, setNombre] = useState("");
@@ -23,17 +24,22 @@ export function CrearProductoModal({ onGuardar }) {
   const [stock, setStock] = useState("");
   const [estado, setEstado] = useState("OPTIMO");
   const [tipo, setTipo] = useState("ACCESORIO");
+  const { toast } = useToast();
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!nombre || !precio || !stock) {
-      alert("Por favor completa todos los campos.");
+    if (!nombre.trim() || !precio || isNaN(parseFloat(precio)) || !stock || isNaN(parseInt(stock))) {
+      toast({
+        title: "Error",
+        description: "Todos los campos son obligatorios",
+        variant: "destructive",
+      });
       return;
     }
 
     const nuevoProducto = {
-      nombreProducto: nombre,
+      nombreProducto: nombre.trim(),
       precio: parseFloat(precio),
       stock: parseInt(stock),
       estadoStock: estado,
@@ -43,15 +49,24 @@ export function CrearProductoModal({ onGuardar }) {
     onGuardar(nuevoProducto);
   };
 
+  const formatPrecio = (value) => {
+    const numericValue = value.replace(/[^0-9.]/g, '');
+    const parts = numericValue.split('.');
+    if (parts.length > 2) {
+      return parts[0] + '.' + parts.slice(1).join('');
+    }
+    return numericValue;
+  };
+
   return (
-    <Card className="w-full max-w-md">
+    <Card className="border-0 shadow-none">
       <CardHeader>
-        <CardTitle>Agregar Nuevo Producto</CardTitle>
+        <CardTitle className="text-lg">Nuevo producto</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="grid gap-4">
-          <div>
-            <Label htmlFor="nombre">Nombre del Producto</Label>
+          <div className="space-y-2">
+            <Label htmlFor="nombre">Nombre del Producto*</Label>
             <Input
               id="nombre"
               value={nombre}
@@ -61,65 +76,67 @@ export function CrearProductoModal({ onGuardar }) {
             />
           </div>
 
-          <div>
-            <Label htmlFor="precio">Precio</Label>
-            <Input
-              id="precio"
-              type="number"
-              step="0.01"
-              value={precio}
-              onChange={(e) => setPrecio(e.target.value)}
-              placeholder="Ej: 12.50"
-              required
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="precio">Precio (S/)*</Label>
+              <Input
+                id="precio"
+                type="text"
+                value={precio}
+                onChange={(e) => setPrecio(formatPrecio(e.target.value))}
+                placeholder="0.00"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="stock">Stock*</Label>
+              <Input
+                id="stock"
+                type="number"
+                min="0"
+                value={stock}
+                onChange={(e) => setStock(e.target.value)}
+                placeholder="0"
+                required
+              />
+            </div>
           </div>
 
-          <div>
-            <Label htmlFor="stock">Stock</Label>
-            <Input
-              id="stock"
-              type="number"
-              value={stock}
-              onChange={(e) => setStock(e.target.value)}
-              placeholder="Ej: 10"
-              required
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="estado">Estado Stock</Label>
-            <Select value={estado} onValueChange={setEstado}>
-              <SelectTrigger>
-                <SelectValue placeholder="Selecciona un estado" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="OPTIMO">Óptimo</SelectItem>
-                <SelectItem value="MEDIO">Medio</SelectItem>
-                <SelectItem value="BAJO">Bajo</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <Label htmlFor="tipo">Tipo de Producto</Label>
-            <Select value={tipo} onValueChange={setTipo}>
-              <SelectTrigger>
-                <SelectValue placeholder="Selecciona un tipo" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="ACCESORIO">Accesorio</SelectItem>
-                <SelectItem value="REPUESTO">Repuesto</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="tipo">Tipo de Producto*</Label>
+              <Select value={tipo} onValueChange={setTipo}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecciona un tipo" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ACCESORIO">Accesorio</SelectItem>
+                  <SelectItem value="REPUESTO">Repuesto</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="estado">Estado Stock*</Label>
+              <Select value={estado} onValueChange={setEstado}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecciona un estado" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="OPTIMO">Óptimo</SelectItem>
+                  <SelectItem value="MEDIO">Medio</SelectItem>
+                  <SelectItem value="BAJO">Bajo</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </form>
       </CardContent>
-      <CardFooter className="flex justify-end gap-2">
+      <CardFooter className="flex justify-end gap-2 pt-4 border-t">
         <Button variant="outline" onClick={() => onGuardar(null)}>
           Cancelar
         </Button>
         <Button type="submit" onClick={handleSubmit}>
-          Guardar Producto
+          Crear producto
         </Button>
       </CardFooter>
     </Card>
