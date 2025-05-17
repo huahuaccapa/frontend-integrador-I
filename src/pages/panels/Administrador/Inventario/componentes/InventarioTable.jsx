@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   flexRender,
   getCoreRowModel,
@@ -16,7 +16,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Filter, Loader2 } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -26,15 +26,15 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-export function InventarioTable({ data, onVer, onEditar, onEliminar, onCrear }) {
+export function InventarioTable({ data, isLoading, onVer, onEditar, onEliminar }) {
   const columns = getColumns(onVer, onEditar, onEliminar);
-  const [sorting, setSorting] = useState([]);
-  const [columnFilters, setColumnFilters] = useState([]);
-  const [columnVisibility, setColumnVisibility] = useState({});
-  const [rowSelection, setRowSelection] = useState({});
-  const [pagination, setPagination] = useState({
+  const [sorting, setSorting] = React.useState([]);
+  const [columnFilters, setColumnFilters] = React.useState([]);
+  const [columnVisibility, setColumnVisibility] = React.useState({});
+  const [rowSelection, setRowSelection] = React.useState({});
+  const [pagination, setPagination] = React.useState({
     pageIndex: 0,
-    pageSize: 4,
+    pageSize: 5,
   });
 
   const table = useReactTable({
@@ -59,8 +59,8 @@ export function InventarioTable({ data, onVer, onEditar, onEliminar, onCrear }) 
   });
 
   return (
-    <>
-      <div className="flex items-center py-4">
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
         <Input
           placeholder="Filtrar por producto..."
           value={table.getColumn("nombreProducto")?.getFilterValue() ?? ""}
@@ -69,13 +69,12 @@ export function InventarioTable({ data, onVer, onEditar, onEliminar, onCrear }) 
           }
           className="max-w-sm"
         />
-        <div className="p-4">
-          <Button onClick={onCrear}>Agregar producto</Button>
-        </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
-              Filtros <ChevronDown />
+              <Filter className="mr-2 h-4 w-4" />
+              Columnas
+              <ChevronDown className="ml-2 h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
@@ -89,7 +88,9 @@ export function InventarioTable({ data, onVer, onEditar, onEliminar, onCrear }) 
                   checked={col.getIsVisible()}
                   onCheckedChange={(value) => col.toggleVisibility(!!value)}
                 >
-                  {col.id}
+                  {col.id === 'nombreProducto' ? 'Nombre' : 
+                   col.id === 'tipoProducto' ? 'Tipo' : 
+                   col.id === 'estadoStock' ? 'Estado' : col.id}
                 </DropdownMenuCheckboxItem>
               ))}
           </DropdownMenuContent>
@@ -98,7 +99,7 @@ export function InventarioTable({ data, onVer, onEditar, onEliminar, onCrear }) 
 
       <div className="rounded-md border">
         <Table>
-          <TableHeader>
+          <TableHeader className="bg-gray-50">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
@@ -115,9 +116,18 @@ export function InventarioTable({ data, onVer, onEditar, onEliminar, onCrear }) 
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {isLoading ? (
+              <TableRow>
+                <TableCell colSpan={columns.length} className="h-24 text-center">
+                  <div className="flex items-center justify-center gap-2 py-8">
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                    <span>Cargando...</span>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
+                <TableRow key={row.id} className="hover:bg-gray-50">
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -127,11 +137,8 @@ export function InventarioTable({ data, onVer, onEditar, onEliminar, onCrear }) 
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  Sin resultados.
+                <TableCell colSpan={columns.length} className="h-24 text-center">
+                  No se encontraron resultados
                 </TableCell>
               </TableRow>
             )}
@@ -139,8 +146,12 @@ export function InventarioTable({ data, onVer, onEditar, onEliminar, onCrear }) 
         </Table>
       </div>
 
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="space-x-2">
+      <div className="flex items-center justify-between px-2">
+        <div className="text-sm text-muted-foreground">
+          Mostrando {table.getRowModel().rows.length} de{" "}
+          {data.length} productos
+        </div>
+        <div className="flex items-center space-x-2">
           <Button
             variant="outline"
             size="sm"
@@ -159,6 +170,6 @@ export function InventarioTable({ data, onVer, onEditar, onEliminar, onCrear }) 
           </Button>
         </div>
       </div>
-    </>
+    </div>
   );
 }
