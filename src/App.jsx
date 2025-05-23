@@ -3,6 +3,8 @@ import DashboardLayout from '@/routes/dashboardlayout';
 import { Clientes } from './pages/panels/Administrador/Cliente/Clientes'; //Ruta de Clientes
 import {Inventario} from './pages/panels/Administrador/Inventario/inventario';//Ruta de Inventario
 import Login from './pages/general/login/Login'; 
+import {Producto} from './pages/panels/Administrador/Inventario/componentes/NuevoProducto'
+import {Catalogo} from './pages/panels/Administrador/Ventas/componentes/Catalogo' 
 
 function App() {
   return (
@@ -16,6 +18,8 @@ function App() {
           <Route path="clientes" element={<Clientes />} />
           {/* Agrega más rutas aquí si deseas */}
           <Route path="inventario" element={<Inventario/>}/>
+          <Route path="ventas" element={<Catalogo/>}/>
+          <Route path="producto" element={<Producto/>}/>
         </Route>
       </Routes>
     </Router>
