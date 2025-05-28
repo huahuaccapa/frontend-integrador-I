@@ -17,7 +17,6 @@ const navigation = [
   {name: 'Inventario', href: '/dashboard/inventario'},
   { name: 'Reportes', href: '/reportes' },
   { name: 'Ventas', href: '/dashboard/ventas' },
-   { name: 'Productos', href: '/dashboard/producto' },
   
 ]
 

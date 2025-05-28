@@ -61,7 +61,7 @@ export function CrearProductoModal({ onGuardar }) {
   return (
     <Card className="border-0 shadow-none">
       <CardHeader>
-        <CardTitle className="text-lg">Nuevo producto</CardTitle>
+        <CardTitle className="text-lg">producto</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="grid gap-4">

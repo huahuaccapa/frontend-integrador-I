@@ -2,12 +2,12 @@ import React, { useEffect, useState } from "react";
 import Services from "@/api/Services";
 import { InventarioTable } from "./componentes/InventarioTable";
 import { ProductoModal } from "./componentes/ProductoModal";
-import { CardWithForm } from "./componentes/Modales/EditarModal";
+import { EditarProducto } from "./componentes/Modales/EditarProducto";
 import { VistaProducto } from "./componentes/Modales/VerProducto";
-import { CrearProductoModal } from "./componentes/Modales/CrearProductoModal";
 import { useToast } from "@/components/ui/use-toast";
 import { Package, PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 export function Inventario() {
   const [productos, setProductos] = useState([]);
@@ -15,6 +15,7 @@ export function Inventario() {
   const [modalType, setModalType] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const cargarProductos = () => {
     setIsLoading(true);
@@ -87,7 +88,8 @@ export function Inventario() {
           <Package className="h-6 w-6 text-primary" />
           <h1 className="text-2xl font-bold">Gestión de Inventario</h1>
         </div>
-        <Button onClick={() => setModalType("crear")} className="gap-2">
+       <Button onClick={() => navigate("/dashboard/inventario/crearproducto")} className="gap-2">
+        {/* Este btn te lleva a crear */}
           <PlusCircle className="h-4 w-4" />
           Nuevo Producto
         </Button>
@@ -122,7 +124,6 @@ export function Inventario() {
               });
             }
           }}
-          onCrear={() => setModalType("crear")}
         />
       </div>
 
@@ -135,15 +136,11 @@ export function Inventario() {
               setModalType("");
             }
           }}
-          title={
-            modalType === "ver" 
-              ? "Detalles del Producto" 
-              : "Editar Producto"
-          }
+          title={modalType === "ver" ? "Detalles del Producto" : "Editar Producto"}
         >
           {modalType === "ver" && <VistaProducto producto={selectedProducto} />}
           {modalType === "editar" && (
-            <CardWithForm
+            <EditarProducto
               producto={selectedProducto}
               onGuardar={(productoEditado) => {
                 if (!productoEditado) {
@@ -176,19 +173,7 @@ export function Inventario() {
         </ProductoModal>
       )}
 
-      {modalType === "crear" && (
-        <ProductoModal
-          open={true}
-          onOpenChange={(open) => {
-            if (!open) {
-              setModalType("");
-            }
-          }}
-          title="Agregar Nuevo Producto"
-        >
-          <CrearProductoModal onGuardar={handleCrearProducto} />
-        </ProductoModal>
-      )}
+     
     </div>
   );
 }

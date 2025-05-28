@@ -48,8 +48,8 @@ export function Producto() {
   }
   return (
     <div>
-        <div>
-            <p className='text-lg text-bond '>Datos del Producto</p>
+       <div>
+            <p className='text-2xl font-semibold text-gray-800 mb-2'>Datos del Producto</p>
         </div>
         <Separator className='my-2'/>
         <div className='grid grid-cols-2'>
@@ -82,6 +82,7 @@ export function Producto() {
                                 </SelectGroup>
                             </SelectContent>
                         </Select>
+                        <Button>Agregar Categoria</Button>
                     </div>
                     {/* PRECIO DEL PRODUCTO */}
                     <div className='sm:col-span-4'>
@@ -173,7 +174,7 @@ export function Producto() {
                         </div>
                     </div>
                     <div className='sm:col-span-4'>
-                        <label className='p-2 font-bold'>Stock Minimo</label>
+                        <label className='p-2 font-bold'>Stock Maximo</label>
                         <div className='m-2 border-black bg-white rounded-lg'>
                             <Input
                             type="number"
@@ -190,6 +191,22 @@ export function Producto() {
                             placeholder="Ingrese la marca"
                             />
                         </div>
+                    </div>
+                     <div className='sm:col-span-4'>
+                        <label className='p-2 font-bold'>Estado</label>
+                        <Select>
+                            <SelectTrigger className="p-2 m-2 w-full">
+                                <SelectValue placeholder="Seleccione una Categoria" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectGroup>
+                                <SelectLabel>Estado</SelectLabel>
+                                <SelectItem value="activo">Activo</SelectItem>
+                                <SelectItem value="inactivo">Inactivo</SelectItem>
+                                </SelectGroup>
+                            </SelectContent>
+                        </Select>
+                       
                     </div>
                     {/*Boton de Guardar */}
                     <Button className='bg-black text-white my-10'>Guardar</Button>
@@ -243,6 +260,7 @@ export function Producto() {
                     </label>
                 </div>
             </div>
+            
         </div>
     </div>      
      

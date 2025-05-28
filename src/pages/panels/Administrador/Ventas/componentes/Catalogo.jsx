@@ -24,10 +24,14 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination"
+import { useNavigate } from "react-router-dom"
 
-export function Catalogo() {
+
+export function Catalogo({ onAbrir, carrito, agregarAlCarrito }) {
   const [busqueda, setBusqueda] = useState("")
   const [paginaActual, setPaginaActual] = useState(1)
+  
+
   const productosPorPagina = 8
 
   // Filtrar productos por nombre
@@ -45,6 +49,8 @@ export function Catalogo() {
     }
   }
 
+
+
   return (
     <div className="px-10 py-6">
       <h2 className="text-2xl font-semibold text-gray-800 mb-2">
@@ -61,12 +67,18 @@ export function Catalogo() {
           value={busqueda}
           onChange={(e) => {
             setBusqueda(e.target.value)
-            setPaginaActual(1) // Reiniciar a la primera página al buscar
+            setPaginaActual(1)
           }}
         />
-        <Button variant="default">
-          <Search className="h-4 w-4 mr-2" />
-          Buscar
+        {/* Aqui sirve para llevar a la siguiente pagina*/}
+        <Button onClick={onAbrir} variant="default" className="relative rounded-full">
+          <ShoppingCart className="h-4 w-4 mr-2" />
+          Procesar Compra
+          {carrito.length > 0 && (
+            <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full px-2 py-0.5">
+              {carrito.length}
+            </span>
+          )}
         </Button>
       </div>
 
@@ -89,7 +101,8 @@ export function Catalogo() {
                       <Button
                         size="icon"
                         variant="ghost"
-                        className="hover:bg-yellow-100 hover:text-green-600"
+                        className="hover:bg-black hover:text-green-600"
+                        onClick={() => agregarAlCarrito(producto)}
                       >
                         <ShoppingCart className="h-5 w-5" />
                       </Button>

@@ -26,7 +26,7 @@ export default function AppSidebar() {
           <SidebarItem icon={ShoppingBag} title="Inventario" to="inventario" />
           <SidebarItem icon={Handshake} title="Proveedores" />
           <SidebarItem icon={Store} title="Ventas" to="ventas" />
-           <SidebarItem icon={Store} title="Productos" to="producto" />
+          
         </nav>
       </div>
 

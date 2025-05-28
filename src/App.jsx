@@ -4,7 +4,8 @@ import { Clientes } from './pages/panels/Administrador/Cliente/Clientes'; //Ruta
 import {Inventario} from './pages/panels/Administrador/Inventario/inventario';//Ruta de Inventario
 import Login from './pages/general/login/Login'; 
 import {Producto} from './pages/panels/Administrador/Inventario/componentes/NuevoProducto'
-import {Catalogo} from './pages/panels/Administrador/Ventas/componentes/Catalogo' 
+import {Ventas} from './pages/panels/Administrador/Ventas/ventas' 
+import { ProcesoVenta } from './pages/panels/Administrador/Ventas/componentes/ProcesoVenta';
 
 function App() {
   return (
@@ -18,8 +19,9 @@ function App() {
           <Route path="clientes" element={<Clientes />} />
           {/* Agrega más rutas aquí si deseas */}
           <Route path="inventario" element={<Inventario/>}/>
-          <Route path="ventas" element={<Catalogo/>}/>
-          <Route path="producto" element={<Producto/>}/>
+          <Route path="ventas" element={<Ventas/>}/>
+          <Route path="/dashboard/inventario/crearproducto" element={<Producto/>}/>
+          <Route path="/dashboard/ventas/carrito" element={<ProcesoVenta />} /> 
         </Route>
       </Routes>
     </Router>
