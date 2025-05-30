@@ -113,7 +113,7 @@ export function ProcesoVenta(){
                       </div>
                 </div>
             </div>
-           {/*Datos del Cliente a Comprar */}
+           {/*Aqui los Datos del Cliente a Comprar se llenan automaticamente*/}
             <p  className="font-bold text-2xl text-black">Datos del Cliente</p>
            <div className="grid grid-cols-2 w-2/3 space-x-4 space-x-reverse">
                <Input
