@@ -127,50 +127,59 @@ export function Inventario() {
         />
       </div>
 
-      {selectedProducto && modalType !== "crear" && (
-        <ProductoModal
-          open={!!modalType}
+     {modalType === "ver" && selectedProducto && (
+  <ProductoModal
+    open={true}
+    onOpenChange={(open) => {
+      if (!open) {
+        setModalType("");
+        setSelectedProducto(null);
+      }
+    }}
+    title="Detalles del Producto"
+  >
+    <VistaProducto producto={selectedProducto} />
+        </ProductoModal>
+      )}
+
+      {modalType === "editar" && selectedProducto && (
+        <EditarProducto
+          open={true}
           onOpenChange={(open) => {
             if (!open) {
-              setSelectedProducto(null);
               setModalType("");
+              setSelectedProducto(null);
             }
           }}
-          title={modalType === "ver" ? "Detalles del Producto" : "Editar Producto"}
-        >
-          {modalType === "ver" && <VistaProducto producto={selectedProducto} />}
-          {modalType === "editar" && (
-            <EditarProducto
-              producto={selectedProducto}
-              onGuardar={(productoEditado) => {
-                if (!productoEditado) {
-                  setModalType("");
-                  return;
-                }
-                Services.actualizarProducto(selectedProducto.id, {
-                  ...productoEditado,
-                  estadoStock: productoEditado.estado
-                })
-                  .then(() => {
-                    cargarProductos();
-                    setModalType("");
-                    setSelectedProducto(null);
-                    toast({
-                      title: "Cambios guardados",
-                      description: `"${productoEditado.nombreProducto}" fue actualizado correctamente`,
-                    });
-                  })
-                  .catch(() => {
-                    toast({
-                      title: "Error",
-                      description: "No se pudieron guardar los cambios",
-                      variant: "destructive",
-                    });
-                  });
-              }}
-            />
-          )}
-        </ProductoModal>
+          producto={selectedProducto}
+          onGuardar={(productoEditado) => {
+            if (!productoEditado) {
+              setModalType("");
+              return;
+            }
+
+            Services.actualizarProducto(selectedProducto.id, {
+              ...productoEditado,
+              estadoStock: productoEditado.estado
+            })
+              .then(() => {
+                cargarProductos();
+                toast({
+                  title: "Cambios guardados",
+                  description: `"${productoEditado.nombreProducto}" fue actualizado correctamente`,
+                });
+                setModalType("");
+                setSelectedProducto(null);
+              })
+              .catch(() => {
+                toast({
+                  title: "Error",
+                  description: "No se pudieron guardar los cambios",
+                  variant: "destructive",
+                });
+              });
+          }}
+        />
       )}
 
      
