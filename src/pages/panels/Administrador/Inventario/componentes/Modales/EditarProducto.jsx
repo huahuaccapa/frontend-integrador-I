@@ -46,14 +46,14 @@ export function EditarProducto(){
                             </Label>                          
                             {/* Miniaturas + botón de agregar */}
                             <div className="flex flex-wrap gap-4">
-                                {images.slice(1).map((img, idx) => (
+                                {images.map((img, idx) => (
                                 <div key={idx} className="relative w-24 h-24 rounded-xl overflow-hidden shadow bg-white">
                                     <img src={img} alt={`img-${idx}`} className="object-cover w-full h-full" />
                                     <div className="absolute top-1 right-1 flex space-x-1">
                                     <button className="bg-white p-0.5 rounded hover:bg-gray-100">
                                         <Upload size={14} />
                                     </button>
-                                    <button onClick={() => handleDelete(idx + 1)} className="bg-white p-0.5 rounded hover:bg-gray-100">
+                                    <button onClick={() => handleDelete(idx)} className="bg-white p-0.5 rounded hover:bg-gray-100">
                                         <Trash2 size={14} />
                                     </button>
                                     </div>

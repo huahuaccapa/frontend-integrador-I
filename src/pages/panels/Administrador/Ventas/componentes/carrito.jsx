@@ -1,20 +1,14 @@
 import * as React from "react"
 import { CircleMinus, CirclePlus, Trash } from "lucide-react"
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet"
-import { Label } from "@/components/ui/label"
+import {Sheet,SheetClose,SheetContent, SheetFooter, SheetHeader, SheetTitle} from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
+import { useNavigate } from "react-router-dom"
 
 export default function Carrito({ open, onOpenChange, carrito, onRemove, onIncrease, onDecrease }) {
   
   const subtotal = carrito.reduce((total, item) => total + item.precio * item.cantidad, 0)
+  const navigate = useNavigate();
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -89,12 +83,16 @@ export default function Carrito({ open, onOpenChange, carrito, onRemove, onIncre
             Regresar a Comprar
           </button>
         </div>*/}
-
+        {/* Boton para ir a Detalle Venta */}
         <SheetFooter className="mt-4">
           <SheetClose asChild>
-            <Button className="bg-green-700 hover:bg-green-600 w-full justify-between text-white font-semibold">
+            <Button
+              onClick={() => navigate("/dashboard/ventas/detalle", { state: { productos: carrito } })}
+              className="bg-green-700 hover:bg-green-600 w-full justify-between text-white font-semibold"
+            >
               COMPRAR <span>SubTotal S/ {subtotal.toFixed(2)}</span>
             </Button>
+
           </SheetClose>
         </SheetFooter>
       </SheetContent>

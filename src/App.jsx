@@ -6,9 +6,11 @@ import Login from './pages/general/login/Login';
 import {Producto} from './pages/panels/Administrador/Inventario/componentes/NuevoProducto'
 import {Ventas} from './pages/panels/Administrador/Ventas/ventas' 
 import { ProcesoVenta } from './pages/panels/Administrador/Ventas/componentes/ProcesoVenta';
+import { Toaster } from "@/components/ui/sonner";
 
 function App() {
   return (
+    <>
     <Router>
       <Routes>
         {/* Ruta principal muestra el Login */}
@@ -20,11 +22,14 @@ function App() {
           {/* Agrega más rutas aquí si deseas */}
           <Route path="inventario" element={<Inventario/>}/>
           <Route path="ventas" element={<Ventas/>}/>
-          <Route path="/dashboard/inventario/crearproducto" element={<Producto/>}/>
-          <Route path="/dashboard/ventas/carrito" element={<ProcesoVenta />} /> 
+          <Route path="/dashboard/inventario/crearproducto" element={<Producto/>}/> 
+          <Route path="/dashboard/ventas/detalle" element={<ProcesoVenta />} /> 
+          <Route path="/dashboard/ventas" element={<Ventas/>}/>
         </Route>
       </Routes>
     </Router>
+    <Toaster />
+    </>
   );
 }
 
