@@ -21,16 +21,32 @@ export function ProcesoVenta(){
         nombre: '',
         apellido: '',
         documento: ''
+        
         })
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [open, setOpen] = useState(false)
     const isAdmin = localStorage.getItem('userRole') === 'ADMIN';
-    const [isLoading, setIsLoading] = React.useState(false);
+    const [isLoading, setIsLoading] = React.useState(false); 
     const navigate = useNavigate();
     const location = useLocation();
     const [searchTerm, setSearchTerm] = useState('');
-    const [productos, setProductos] = React.useState(location.state?.productos || []);
+
+    
+    const [productos, setProductos] = React.useState(() => {
+  const raw = location.state?.productos || [];
+  console.log("Productos recibidos:", raw); // Para debuggear
+  
+  return raw.map(p => ({
+    id: p.id,
+    nombre: p.nombreProducto || p.nombre || 'Sin nombre',
+    detalle: [p.tipoProducto, p.categoria].filter(Boolean).join(' - ') || 'Sin detalle',
+    cantidad: Number(p.cantidad) || 1,
+    precio: Number(p.precio) || Number(p.precioVenta) || 0,
+    // Añade más campos si es necesario
+  }));
+});
+    
     const total = productos.reduce((sum, item) => sum + item.precio * item.cantidad, 0);
     const [clientes, setClientes] = useState([]);
     const [search, setSearch] = useState("");
@@ -92,6 +108,8 @@ export function ProcesoVenta(){
                             onClick={() => {
                                 // Guardar datos seleccionados si es necesario
                                 setCliente({
+                                
+                                id:cliente.id,    
                                 nombre: cliente.nombre,
                                 apellido: cliente.apellidos,
                                 documento: cliente.identificacion
