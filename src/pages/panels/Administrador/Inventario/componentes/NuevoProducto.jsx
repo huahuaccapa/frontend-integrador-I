@@ -82,7 +82,6 @@ export function Producto() {
                                 </SelectGroup>
                             </SelectContent>
                         </Select>
-                        <Button>Agregar Categoria</Button>
                     </div>
                     {/* PRECIO DEL PRODUCTO */}
                     <div className='sm:col-span-4'>

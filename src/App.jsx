@@ -10,7 +10,7 @@ import { Toaster } from "@/components/ui/sonner";
 
 function App() {
   return (
-    <>
+    <div className='bg-yellow-300'>
     <Router>
       <Routes>
         {/* Ruta principal muestra el Login */}
@@ -29,7 +29,7 @@ function App() {
       </Routes>
     </Router>
     <Toaster />
-    </>
+    </div>
   );
 }
 
