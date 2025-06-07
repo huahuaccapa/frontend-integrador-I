@@ -24,7 +24,7 @@ export default function AppSidebar() {
           <SidebarItem icon={User} title="Clientes" to="clientes" /> {/* Cambiado a ruta relativa */}
           <SidebarItem icon={Proportions} title="Reportes" />
           <SidebarItem icon={ShoppingBag} title="Inventario" to="inventario" />
-          <SidebarItem icon={Handshake} title="Proveedores" />
+          <SidebarItem icon={Handshake} title="Proveedores" to="proveedores"/>
           <SidebarItem icon={Store} title="Ventas" to="ventas" />
           
         </nav>
