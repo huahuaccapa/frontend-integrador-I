@@ -3,19 +3,36 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogClose } from "@/components/ui/dialog";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export function NuevoPedido() {
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Detectar si estamos en modo edición
+  const isEditing = location.state?.isEditing || false;
+  const pedidoData = location.state?.pedidoData || null;
 
   const [productos, setProductos] = useState([]);
   const [proveedor, setProveedor] = useState(null);
   const [modalData, setModalData] = useState(null);
   const [fechaEntrega, setFechaEntrega] = useState("");
   const [modoPago, setModoPago] = useState("Cancelado");
+  const [nroPedido, setNroPedido] = useState("003");
 
   const proveedoresRegistrados = ["Proveedor A", "Proveedor B", "Proveedor C"];
+
+  // Efecto para cargar datos del pedido a editar
+  useEffect(() => {
+    if (isEditing && pedidoData) {
+      setProductos(pedidoData.productos || []);
+      setProveedor(pedidoData.proveedor);
+      setFechaEntrega(pedidoData.fechaEntrega || "");
+      setModoPago(pedidoData.pago || "Cancelado");
+      setNroPedido(pedidoData.nro);
+    }
+  }, [isEditing, pedidoData]);
 
   const handleAgregarProducto = (producto) => {
     if (modalData?.index !== undefined) {
@@ -42,20 +59,33 @@ export function NuevoPedido() {
     return productos.reduce((acc, producto) => acc + producto.subtotal, 0);
   };
 
+  const handleGuardar = () => {
+    if (isEditing) {
+      alert("Pedido actualizado correctamente");
+    } else {
+      alert("Pedido guardado correctamente");
+    }
+    // Aquí puedes agregar la lógica para guardar/actualizar el pedido
+  };
+
   return (
     <div className="p-2 space-y-4">
-      <h1 className="text-2xl font-bold">PROVEEDORES/PEDIDO/NUEVO PEDIDO</h1>
+      <h1 className="text-2xl font-bold">
+        PROVEEDORES/PEDIDO/{isEditing ? "EDITAR PEDIDO" : "NUEVO PEDIDO"}
+      </h1>
 
       {/* Nro de pedido */}
       <div className="flex items-center space-x-4">
         <label className="text-sm font-semibold">Nro de Pedido:</label>
-        <div className="px-4 py-2 bg-gray-100 rounded-md border text-gray-700">003</div>
+        <div className="px-4 py-2 bg-gray-100 rounded-md border text-gray-700">
+          {nroPedido}
+        </div>
       </div>
 
       {/* Proveedor */}
       <div className="flex items-center space-x-4">
         <label className="text-sm font-semibold">Proveedor:</label>
-        <Select onValueChange={setProveedor}>
+        <Select onValueChange={setProveedor} value={proveedor}>
           <SelectTrigger className="w-64">
             <SelectValue placeholder="Selecciona un proveedor" />
           </SelectTrigger>
@@ -74,7 +104,9 @@ export function NuevoPedido() {
         <label className="text-sm font-semibold">Lista de productos:</label>
         <Dialog open={!!modalData} onOpenChange={(open) => !open && setModalData(null)}>
           <DialogTrigger>
-            <Button className="flex items-center gap-2" onClick={() => setModalData({})} >Agregar Producto</Button>
+            <Button className="flex items-center gap-2" onClick={() => setModalData({})} >
+              Agregar Producto
+            </Button>
           </DialogTrigger>
           <DialogContent>
             <ProductoModal
@@ -175,8 +207,8 @@ export function NuevoPedido() {
         <Button variant="secondary" onClick={() => navigate("/dashboard/proveedores/pedidos")}>
           Volver
         </Button>
-        <Button variant="primary" onClick={() => alert("Pedido guardado")}>
-          Guardar
+        <Button variant="primary" onClick={handleGuardar}>
+          {isEditing ? "Actualizar" : "Guardar"}
         </Button>
       </div>
     </div>

@@ -7,23 +7,45 @@ import { useNavigate } from "react-router-dom";
 export function Pedido() {
   const navigate = useNavigate();
 
+  // Datos simulados más completos para el ejemplo
   const mockData = [
-    { id: 1, nro: "001", descripcion: "Pedido de laptops", estado: "En Proceso", proveedor: "Proveedor A", pago: "Adelanto" },
-    { id: 2, nro: "002", descripcion: "Pedido de teléfonos", estado: "Completado", proveedor: "Proveedor B", pago: "Cancelado" },
-    { id: 1, nro: "001", descripcion: "Pedido de laptops", estado: "En Proceso", proveedor: "Proveedor A", pago: "Adelanto" },
-    { id: 2, nro: "002", descripcion: "Pedido de teléfonos", estado: "Completado", proveedor: "Proveedor B", pago: "Cancelado" },
-    { id: 1, nro: "001", descripcion: "Pedido de laptops", estado: "En Proceso", proveedor: "Proveedor A", pago: "Adelanto" },
-    { id: 2, nro: "002", descripcion: "Pedido de teléfonos", estado: "Completado", proveedor: "Proveedor B", pago: "Cancelado" },
-    { id: 1, nro: "001", descripcion: "Pedido de laptops", estado: "En Proceso", proveedor: "Proveedor A", pago: "Adelanto" },
-    { id: 2, nro: "002", descripcion: "Pedido de teléfonos", estado: "Completado", proveedor: "Proveedor B", pago: "Cancelado" },
-    { id: 1, nro: "001", descripcion: "Pedido de laptops", estado: "En Proceso", proveedor: "Proveedor A", pago: "Adelanto" },
-    { id: 2, nro: "002", descripcion: "Pedido de teléfonos", estado: "Completado", proveedor: "Proveedor B", pago: "Cancelado" },
-    { id: 1, nro: "001", descripcion: "Pedido de laptops", estado: "En Proceso", proveedor: "Proveedor A", pago: "Adelanto" },
-    { id: 2, nro: "002", descripcion: "Pedido de teléfonos", estado: "Completado", proveedor: "Proveedor B", pago: "Cancelado" },
-    { id: 1, nro: "001", descripcion: "Pedido de laptops", estado: "En Proceso", proveedor: "Proveedor A", pago: "Adelanto" },
-    { id: 2, nro: "002", descripcion: "Pedido de teléfonos", estado: "Completado", proveedor: "Proveedor B", pago: "Cancelado" },
-    // Agrega más datos ficticios aquí si lo necesitas
+    { 
+      id: 1, 
+      nro: "001", 
+      descripcion: "Pedido de laptops", 
+      estado: "En Proceso", 
+      proveedor: "Proveedor A", 
+      pago: "Adelanto",
+      fechaEntrega: "2024-12-15",
+      productos: [
+        { descripcion: "Laptop HP", modelo: "Pavilion 15", cantidad: 2, precioUnitario: 800, subtotal: 1600 },
+        { descripcion: "Mouse", modelo: "Logitech M100", cantidad: 2, precioUnitario: 25, subtotal: 50 }
+      ]
+    },
+    { 
+      id: 2, 
+      nro: "002", 
+      descripcion: "Pedido de teléfonos", 
+      estado: "Completado", 
+      proveedor: "Proveedor B", 
+      pago: "Cancelado",
+      fechaEntrega: "2024-11-20",
+      productos: [
+        { descripcion: "iPhone", modelo: "14 Pro", cantidad: 1, precioUnitario: 1200, subtotal: 1200 }
+      ]
+    },
+    // Puedes agregar más datos aquí...
   ];
+
+  const handleEditarPedido = (pedido) => {
+    // Navegar a la página de nuevo pedido con los datos del pedido a editar
+    navigate("/dashboard/proveedores/pedidos/nuevo", {
+      state: {
+        isEditing: true,
+        pedidoData: pedido
+      }
+    });
+  };
 
   return (
     <div className="relative flex flex-col h-screen p-2">
@@ -60,9 +82,7 @@ export function Pedido() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() =>
-                      navigate("/dashboard/proveedores/pedidos/nuevo")
-                    }
+                    onClick={() => handleEditarPedido(pedido)}
                   >
                     <Pencil className="w-4 h-4" />
                   </Button>
