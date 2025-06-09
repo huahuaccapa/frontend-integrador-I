@@ -3,8 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import axios from "axios";
 import { toast } from "@/components/ui/use-toast";
+import ServiceProveedores from "@/api/ServiceProveedores";
 
 export function FormProveedor({ onSuccess, proveedor, isEdit = false }) {
   const {
@@ -13,45 +13,51 @@ export function FormProveedor({ onSuccess, proveedor, isEdit = false }) {
     reset,
     formState: { errors, isSubmitting },
   } = useForm({
-    defaultValues: proveedor || {
-      ruc: "",
-      tipo: "",
-      nombre: "",
-      direccion: "",
-      pais: "",
-      region: "",
-      distrito: "",
-      rubro: "",
-      tipoProductos: "",
-      telefono: "",
-      correo: "",
-    },
+   defaultValues: {
+     ...(proveedor || {}),
+  ruc: proveedor?.ruc || "",
+  tipoProveedor: proveedor?.tipoProveedor || "",
+  nombre: proveedor?.nombre || "",
+  codigoPostal: proveedor?.codigoPostal || "",
+  paisProveedor: proveedor?.paisProveedor || "",
+  ciudad: proveedor?.ciudad || "",
+  distrito: proveedor?.distrito || "",
+  direccion: proveedor?.direccion || "",
+  rubro: proveedor?.rubro || "",
+  tipoProducto: proveedor?.tipoProducto || "",
+  telefono: proveedor?.telefono || "",
+  correo: proveedor?.correo || "",
+},
+
   });
 
   const onSubmit = async (data) => {
     try {
+      if (!data.nombre) {
+        throw new Error("El nombre es requerido");
+      }
+
       const proveedorData = {
-        ruc: data.ruc.trim(),
-        tipo: data.tipo.trim(),
-        nombre: data.nombre.trim(),
-        direccion: data.direccion.trim(),
-        pais: data.pais.trim(),
-        region: data.region.trim(),
-        distrito: data.distrito.trim(),
-        rubro: data.rubro.trim(),
-        tipoProductos: data.tipoProductos.trim(),
-        telefono: data.telefono.trim(),
-        correo: data.correo.trim(),
+        ruc: data.ruc?.trim() || "",
+        tipoProveedor: data.tipoProveedor?.trim() || "Local",
+        nombre: data.nombre?.trim() || "",
+        codigoPostal: data.codigoPostal?.trim() || "",
+        paisProveedor: data.paisProveedor?.trim() || "",
+        ciudad: data.ciudad?.trim() || "",
+        distrito: data.distrito?.trim() || "",
+        direccion: data.direccion?.trim() || "",
+        rubro: data.rubro?.trim() || "",
+        tipoProducto: data.tipoProducto?.trim() || "",
+        telefono: data.telefono?.trim() || "",
+        correo: data.correo?.trim() || "",
       };
 
-      const url =
-        isEdit && proveedor?.id
-          ? `http://localhost:8080/api/proveedores/${proveedor.id}`
-          : "http://localhost:8080/api/proveedores";
-
-      const method = isEdit ? "put" : "post";
-
-      await axios[method](url, proveedorData);
+      let response;
+      if (isEdit && proveedor?.id) {
+        response = await ServiceProveedores.updateProveedor(proveedor.id, proveedorData);
+      } else {
+        response = await ServiceProveedores.createProveedor(proveedorData);
+      }
 
       toast({
         title: "Éxito",
@@ -60,16 +66,26 @@ export function FormProveedor({ onSuccess, proveedor, isEdit = false }) {
           : "Proveedor registrado correctamente",
         variant: "default",
       });
+      
       reset();
-      if (onSuccess) onSuccess();
+      
+      // Llama a onSuccess con los datos correctos
+      if (onSuccess) {
+        const successData = isEdit ? 
+          { ...proveedorData, id: proveedor.id } : 
+          (response?.data || proveedorData);
+        onSuccess(successData);
+      }
     } catch (error) {
+      console.error("Error detallado:", error);
       toast({
         title: "Error",
-        description: error.response?.data || error.message,
+        description: error.response?.data?.message || error.message || "Error desconocido",
         variant: "destructive",
       });
     }
   };
+
 
   return (
     <div className="max-h-[80vh] overflow-y-auto p-4">
@@ -86,12 +102,12 @@ export function FormProveedor({ onSuccess, proveedor, isEdit = false }) {
               required: true,
             },
             {
-              id: "tipo",
+              id: "tipoProveedor",
               label: "Tipo",
               component: (
                 <select
-                  id="tipo"
-                  {...register("tipo", { required: "Este campo es obligatorio" })}
+                  id="tipoProveedor"
+                  {...register("tipoProveedor", { required: "Este campo es obligatorio" })}
                   className="col-span-3 bg-white border border-gray-300 rounded-md focus:ring focus:ring-blue-500 focus:border-blue-500"
                   disabled={isSubmitting}
                 >
@@ -115,7 +131,7 @@ export function FormProveedor({ onSuccess, proveedor, isEdit = false }) {
               placeholder: "Codigo Postal",
             },
             {
-              id: "pais",
+              id: "paisProveedor",
               label: "País",
               placeholder: "País del proveedor",
             },
@@ -134,14 +150,13 @@ export function FormProveedor({ onSuccess, proveedor, isEdit = false }) {
               label: "Dirección",
               placeholder: "Dirección del proveedor",
             },
-
             {
               id: "rubro",
               label: "Rubro",
               placeholder: "Rubro de negocios",
             },
             {
-              id: "tipoProductos",
+              id: "tipoProducto",
               label: "Tipo de Productos",
               placeholder: "Productos que provee",
             }].map(({ id, label, placeholder, required, component }) => (

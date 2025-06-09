@@ -20,22 +20,18 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/components/ui/use-toast";
+import ServiceProveedores from "@/api/ServiceProveedores";
+import { Proveedores } from "../proveedor";
 
-export function TableDemoProveedor({ proveedores, onProveedorDeleted }) {
+export function TableDemoProveedor({ proveedores, onProveedorDeleted , onProveedorUpdated}) {
   const isAdmin = localStorage.getItem('userRole') === 'ADMIN';
 
-  const handleDelete = async (id) => {
+ const handleDelete = async (id) => {
     try {
       const confirmar = window.confirm("¿Estás seguro de eliminar este proveedor?");
       if (!confirmar) return;
 
-      await axios.delete(`http://localhost:8080/api/proveedores/${id}`);
-      onProveedorDeleted();
-      toast({
-        title: "Éxito",
-        description: "Proveedor eliminado correctamente",
-        variant: "default",
-      });
+      await onProveedorDeleted(id); // Usa la función del padre
     } catch (error) {
       console.error("Error al eliminar:", error);
       toast({
@@ -56,7 +52,7 @@ export function TableDemoProveedor({ proveedores, onProveedorDeleted }) {
           <TableHead>Teléfono</TableHead>
           <TableHead>Correo</TableHead>
           <TableHead>Ubicación</TableHead>
-          <TableHead>Rubro</TableHead>
+          <TableHead>Tipo de Producto</TableHead>
           {isAdmin && <TableHead className="text-right">Acciones</TableHead>}
         </TableRow>
       </TableHeader>
@@ -67,13 +63,13 @@ export function TableDemoProveedor({ proveedores, onProveedorDeleted }) {
             <TableCell>{proveedor.nombre || '-'}</TableCell>
             <TableCell>{proveedor.telefono || '-'}</TableCell>
             <TableCell>{proveedor.correo || '-'}</TableCell>
-            <TableCell>{proveedor.ubicacion || '-'}</TableCell>
-            <TableCell>{proveedor.rubro || '-'}</TableCell>
+            <TableCell>{proveedor.ciudad || '-'}</TableCell>
+            <TableCell>{proveedor.tipoProducto || '-'}</TableCell>
             {isAdmin && (
               <TableCell className="text-right">
                 <EditProveedorDialog 
                   proveedor={proveedor} 
-                  onProveedorUpdated={onProveedorDeleted} 
+                  onProveedorUpdated={onProveedorUpdated} 
                 />
                 <Button 
                   variant="destructive" 
@@ -96,31 +92,30 @@ function EditProveedorDialog({ proveedor, onProveedorUpdated }) {
   const { register, handleSubmit, formState: { errors } } = useForm({
     defaultValues: {
       ruc: proveedor.ruc,
-      tipo: proveedor.tipo || "",
-      nombre: proveedor.nombre,
-      direccion: proveedor.direccion || "",
-      pais: proveedor.pais || "",
+      tipo: proveedor.tipoProveedor,
+      nombre: proveedor.nombre || "",
+      codigoPostal:proveedor.codigoPostal || "",
+      paisProveedor: proveedor.paisProveedor || "",
+      ciudad: proveedor.ciudad || "",
       region: proveedor.region || "",
       distrito: proveedor.distrito || "",
+      direccion: proveedor.direccion || "",
       rubro: proveedor.rubro || "",
-      tipoProductos: proveedor.tipoProductos || "",
+      tipoProducto: proveedor.tipoProducto || "",
       telefono: proveedor.telefono || "",
       correo: proveedor.correo,
     },
   });
 
-  const onSubmit = async (data) => {
+   const onSubmit = async (data) => {
     try {
-      const response = await axios.put(`http://localhost:8080/api/proveedores/${proveedor.id}`, data);
-
-      if (response.status === 200) {
-        toast({
-          title: "Éxito",
-          description: "Proveedor actualizado correctamente",
-          variant: "default",
-        });
-        onProveedorUpdated();
-      }
+      await ServiceProveedores.updateProveedor(proveedor.id, data);
+      toast({
+        title: "Éxito",
+        description: "Proveedor actualizado correctamente",
+        variant: "default",
+      });
+      onProveedorUpdated(); // Notifica al padre para actualizar
     } catch (error) {
       console.error("Error al actualizar proveedor:", error);
       toast({
@@ -179,7 +174,7 @@ function EditProveedorDialog({ proveedor, onProveedorUpdated }) {
             placeholder: "Ingrese el código postal",
           },
           {
-            id: "pais",
+            id: "paisProveedor",
             label: "País",
             placeholder: "País del proveedor",
           },
@@ -204,7 +199,7 @@ function EditProveedorDialog({ proveedor, onProveedorUpdated }) {
             placeholder: "Rubro de negocios",
           },
           {
-            id: "tipoProductos",
+            id: "tipoProducto",
             label: "Tipo de Productos",
             placeholder: "Productos que provee",
           },
