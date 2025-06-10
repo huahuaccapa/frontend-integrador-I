@@ -9,7 +9,7 @@ import {Select,SelectContent,SelectGroup,SelectItem,SelectLabel,SelectTrigger,Se
 } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 
-export function EditarProducto(){
+export function EditarProducto({open, onOpenChange}){
      const [images, setImages] = useState([])
     
       const handleAddImage = (e) => {
@@ -30,10 +30,7 @@ export function EditarProducto(){
       }
     return(
         <div className="p-4">
-         <Sheet>
-            <SheetTrigger asChild>
-                <Button variant="outline">Open</Button>
-            </SheetTrigger>
+         <Sheet open={open} onOpenChange={onOpenChange}>
             <SheetContent className="p-2 bg-green-800" >
                 <SheetHeader>
                 <SheetTitle className='font-semibond text-2xl text-white'>Editar Producto</SheetTitle>
@@ -126,7 +123,13 @@ export function EditarProducto(){
                     </div>
                 <SheetFooter>
                 <SheetClose asChild>
-                    <Button type="submit">Guardar</Button>
+                    <Button type="submit"  onClick={() => {
+                        const confirmCancel = window.confirm("¿Estás seguro de guardar los cambios?");
+                        if (confirmCancel) {
+                            onOpenChange(true); // Cierra el modal
+                        }
+                        }}
+                    >Guardar</Button>
                     
                 </SheetClose>
                 </SheetFooter>

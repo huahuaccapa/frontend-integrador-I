@@ -1,14 +1,23 @@
 import * as React from "react"
 import { CircleMinus, CirclePlus, Trash } from "lucide-react"
-import {Sheet,SheetClose,SheetContent, SheetFooter, SheetHeader, SheetTitle} from "@/components/ui/sheet"
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle
+} from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { useNavigate } from "react-router-dom"
 
 export default function Carrito({ open, onOpenChange, carrito, onRemove, onIncrease, onDecrease }) {
-  
-  const subtotal = carrito.reduce((total, item) => total + item.precio * item.cantidad, 0)
-  const navigate = useNavigate();
+  const subtotal = carrito.reduce(
+    (total, item) => total + item.precioCompra * item.cantidad,
+    0
+  )
+  const navigate = useNavigate()
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -27,12 +36,12 @@ export default function Carrito({ open, onOpenChange, carrito, onRemove, onIncre
                 <div className="flex items-center gap-4">
                   <img
                     src={item.imagen}
-                    alt={item.nombre}
+                    alt={item.nombreProducto}
                     className="h-24 w-24 rounded-lg object-cover"
                   />
                   <div className="flex-1 space-y-1">
-                    <h3 className="font-medium truncate">{item.nombre}</h3>
-                    <p className="text-lg font-semibold">S/ {item.precio}</p>
+                    <h3 className="font-medium truncate">{item.nombreProducto}</h3>
+                    <p className="text-lg font-semibold">S/ {item.precioCompra}</p>
                     <div className="flex items-center gap-3 mt-2">
                       <Button
                         size="icon"
@@ -78,21 +87,18 @@ export default function Carrito({ open, onOpenChange, carrito, onRemove, onIncre
           </div>
         </div>
 
-        {/*<div className="text-center mt-2">
-          <button className="text-red-600 underline hover:text-red-800">
-            Regresar a Comprar
-          </button>
-        </div>*/}
-        {/* Boton para ir a Detalle Venta */}
         <SheetFooter className="mt-4">
           <SheetClose asChild>
             <Button
-              onClick={() => navigate("/dashboard/ventas/detalle", { state: { productos: carrito } })}
+              onClick={() =>
+                navigate("/dashboard/ventas/detalle", {
+                  state: { productos: carrito }
+                })
+              }
               className="bg-green-700 hover:bg-green-600 w-full justify-between text-white font-semibold"
             >
               COMPRAR <span>SubTotal S/ {subtotal.toFixed(2)}</span>
             </Button>
-
           </SheetClose>
         </SheetFooter>
       </SheetContent>

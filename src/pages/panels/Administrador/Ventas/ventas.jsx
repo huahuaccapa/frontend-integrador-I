@@ -9,7 +9,8 @@ export function Ventas() {
 
   // Función para agregar productos al carrito
   const agregarProductoAlCarrito = (producto) => {
-  const precioNumerico = parseFloat(producto.precio.replace("S/.", "").trim())
+  const precioNumerico = producto.precio
+
 
   setCarrito((prev) => {
     const existente = prev.find((p) => p.nombre === producto.nombre)

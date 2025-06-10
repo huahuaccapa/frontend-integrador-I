@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/sheet";
 import { FormCliente } from "./FormCliente";
 
-export function SheetDemo({ onClienteAdded }) {
+export function RegistrarCliente({ onClienteAdded }) {
   const isAdmin = localStorage.getItem('userRole') === 'ADMIN';
 
   if (!isAdmin) {
@@ -18,12 +18,9 @@ export function SheetDemo({ onClienteAdded }) {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button className="mb-4">+ Nuevo Cliente</Button>
+        <Button className="mb-4">Nuevo Cliente</Button>
       </SheetTrigger>
-      <SheetContent>
-        <SheetHeader>
-          <SheetTitle>Registro de Cliente</SheetTitle>
-        </SheetHeader>
+      <SheetContent className='p-4 bg-green-800'>
         <FormCliente onSuccess={onClienteAdded} />
       </SheetContent>
     </Sheet>
