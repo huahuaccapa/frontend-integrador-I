@@ -9,12 +9,8 @@ class VentaService {
   }
 
   // 2. Agregar una nueva venta
-  crearVenta(ventaData) {
-    return axios.post(VENTA_BASE_REST_API_URL, ventaData, {
-      headers: {
-        "Content-Type": "application/json"
-      }
-    });
+  crearVenta(venta) {
+    return axios.post(VENTA_BASE_REST_API_URL, venta);
   }
 }
 

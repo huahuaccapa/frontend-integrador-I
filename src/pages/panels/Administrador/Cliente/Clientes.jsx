@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { TableDemo } from './Components/TableDemo';
-import { SheetDemo } from './Components/SheetDemo';
+import { ClienteTable } from './Components/ClienteTable/ClienteTable';
+import { RegistrarCliente } from './Components/NewClient';
 import axios from 'axios';
 import { Toaster } from "@/components/ui/toaster";
 import { toast } from "@/components/ui/use-toast";
@@ -14,8 +14,6 @@ export function Clientes() {
   const [searchTerm, setSearchTerm] = useState('');
   
   const isAdmin = localStorage.getItem('userRole') === 'ADMIN';
-
-
 
   const fetchClientes = async () => {
     setLoading(true);
@@ -59,7 +57,7 @@ export function Clientes() {
   return (
     <div className="p-4">
       <div className="flex justify-between items-center mb-4">
-      {isAdmin && <SheetDemo onClienteAdded={fetchClientes} />}
+        {isAdmin && <RegistrarCliente onClienteAdded={fetchClientes} />}
         <Input
           type="text"
           placeholder="Buscar clientes..."
@@ -82,7 +80,7 @@ export function Clientes() {
           <p>No hay clientes {searchTerm ? 'que coincidan con la búsqueda' : 'registrados'}</p>
         </div>
       ) : (
-        <TableDemo clientes={filteredClientes} onClienteDeleted={fetchClientes} />
+        <ClienteTable clientes={filteredClientes} onClienteDeleted={fetchClientes} />
       )}
       
       <Toaster />

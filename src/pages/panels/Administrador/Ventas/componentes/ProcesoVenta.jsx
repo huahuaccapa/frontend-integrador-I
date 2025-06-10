@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { DataTableVentas } from "./VentasTable/Ventastabla"
 import { useLocation, useNavigate } from "react-router-dom"
-import { SheetDemo } from '@/pages/panels/Administrador/Cliente/Components/Sheetdemo';
+import { RegistrarCliente } from '@/pages/panels/Administrador/Cliente/Components/NewClient';
 import {Metodo} from "./Modales/Metodopago"
 import { toast } from "sonner"; // 
 
@@ -127,7 +127,7 @@ export function ProcesoVenta(){
                 </div>
                 <div className="p-4">
                       <div className="flex justify-between items-center mb-4">
-                      {isAdmin && <SheetDemo onClienteAdded={fetchClientes} />}
+                      {isAdmin && <RegistrarCliente onClienteAdded={fetchClientes} />}
                       </div>
                 </div>
             </div>
