@@ -5,6 +5,9 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogClose } from "@/components/ui/dialog";
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import ServiceProveedores from "@/api/ServiceProveedores";
+import ServicePedido from "@/api/ServicePedido";
+import ServiceDetallePedido from "@/api/ServiceDetallePedido";
 
 export function NuevoPedido() {
   const navigate = useNavigate();
@@ -21,28 +24,128 @@ export function NuevoPedido() {
   const [modoPago, setModoPago] = useState("Cancelado");
   const [nroPedido, setNroPedido] = useState("003");
 
-  const proveedoresRegistrados = ["Proveedor A", "Proveedor B", "Proveedor C"];
+  const [proveedores, setProveedores] = useState([]);
+  const [cargando, setCargando] = useState(false);
+
 
   // Efecto para cargar datos del pedido a editar
   useEffect(() => {
+  const cargarDatosEdicion = async () => {
     if (isEditing && pedidoData) {
-      setProductos(pedidoData.productos || []);
-      setProveedor(pedidoData.proveedor);
-      setFechaEntrega(pedidoData.fechaEntrega || "");
-      setModoPago(pedidoData.pago || "Cancelado");
-      setNroPedido(pedidoData.nro);
-    }
-  }, [isEditing, pedidoData]);
+      try {
+        // Primero cargar los datos básicos del pedido
+        setProveedor(pedidoData.proveedorId);
+        setFechaEntrega(pedidoData.fechaEntrega || "");
+        setModoPago(pedidoData.metodoPago || "Cancelado");
+        setNroPedido(pedidoData.id.toString());
 
-  const handleAgregarProducto = (producto) => {
+        // Luego cargar los detalles específicos
+        const response = await ServiceDetallePedido.getAllDetalles();
+        
+        // Verificar que la respuesta tiene datos
+        if (response.data && Array.isArray(response.data)) {
+          // Convertir pedidoData.id a número para comparación estricta
+          const pedidoIdNum = parseInt(pedidoData.id);
+          
+          const detallesPedido = response.data.filter(
+            detalle => detalle.pedidoId === pedidoIdNum
+          );
+
+          console.log("Detalles cargados:", detallesPedido); // Para depuración
+          
+          setProductos(detallesPedido.map(detalle => ({
+            id: detalle.id,
+            descripcion: detalle.descripcion,
+            modelo: detalle.modelo,
+            cantidad: detalle.cantidad,
+            precioUnitario: detalle.precioUnitario,
+            subtotal: detalle.cantidad * detalle.precioUnitario
+          })));
+        } else {
+          console.error("Formato de respuesta inesperado:", response);
+        }
+      } catch (error) {
+        console.error("Error al cargar detalles del pedido:", error);
+        alert("Error al cargar los detalles del pedido");
+      }
+    }
+  };
+  
+  cargarDatosEdicion();
+}, [isEditing, pedidoData]);
+
+  useEffect(() => {
+  const cargarProveedores = async () => {
+    try {
+      const response = await ServiceProveedores.getAllProveedores(); // Agrega paréntesis
+      setProveedores(response.data);
+    } catch (error) {
+      console.error("Error al cargar proveedores:", error);
+      setProveedores([]); // Establece un array vacío como fallback
+    }
+  };
+  
+  cargarProveedores();
+}, []);
+
+ const handleAgregarProducto = async (producto) => {
     if (modalData?.index !== undefined) {
       // Editar producto existente
-      setProductos((prev) =>
-        prev.map((p, index) => (index === modalData.index ? producto : p))
-      );
+      if (productos[modalData.index].id) {
+        // Si tiene ID, es un producto existente que debemos actualizar en el backend
+        try {
+          await ServiceDetallePedido.updateDetalle(
+            productos[modalData.index].id,
+            {
+              modelo: producto.modelo,
+              precioUnitario: producto.precioUnitario,
+              cantidad: producto.cantidad,
+              descripcion: producto.descripcion
+            }
+          );
+          
+          // Actualizar el estado local
+          setProductos(prev =>
+            prev.map((p, index) => (index === modalData.index ? producto : p))
+          );
+        } catch (error) {
+          console.error("Error al actualizar detalle:", error);
+          alert("Error al actualizar producto");
+          return;
+        }
+      } else {
+        // Producto nuevo que aún no se ha guardado en el backend
+        setProductos(prev =>
+          prev.map((p, index) => (index === modalData.index ? producto : p))
+        );
+      }
     } else {
       // Agregar nuevo producto
-      setProductos((prev) => [...prev, producto]);
+      if (isEditing) {
+        // Si estamos editando, guardar primero en el backend
+        try {
+          const response = await ServiceDetallePedido.createDetalle({
+            pedidoId: parseInt(nroPedido),
+            modelo: producto.modelo,
+            precioUnitario: producto.precioUnitario,
+            cantidad: producto.cantidad,
+            descripcion: producto.descripcion
+          });
+          
+          // Agregar el producto con su ID
+          setProductos(prev => [...prev, {
+            ...producto,
+            id: response.data.id
+          }]);
+        } catch (error) {
+          console.error("Error al crear detalle:", error);
+          alert("Error al agregar producto");
+          return;
+        }
+      } else {
+        // Si es un nuevo pedido, solo agregar al estado local
+        setProductos(prev => [...prev, producto]);
+      }
     }
     setModalData(null);
   };
@@ -51,22 +154,91 @@ export function NuevoPedido() {
     setModalData({ ...productos[index], index });
   };
 
-  const handleEliminarProducto = (index) => {
-    setProductos((prev) => prev.filter((_, i) => i !== index));
+   const handleEliminarProducto = async (index) => {
+    const producto = productos[index];
+    
+    if (producto.id) {
+      // Si tiene ID, es un producto existente que debemos eliminar del backend
+      try {
+        await ServiceDetallePedido.deleteDetalle(producto.id);
+        setProductos(prev => prev.filter((_, i) => i !== index));
+      } catch (error) {
+        console.error("Error al eliminar detalle:", error);
+        alert("Error al eliminar producto");
+        return;
+      }
+    } else {
+      // Producto nuevo que solo existe en el estado local
+      setProductos(prev => prev.filter((_, i) => i !== index));
+    }
   };
 
   const calcularTotal = () => {
     return productos.reduce((acc, producto) => acc + producto.subtotal, 0);
   };
 
-  const handleGuardar = () => {
+const handleGuardar = async () => {
+  if (!proveedor) {
+    alert("Debe seleccionar un proveedor");
+    return;
+  }
+
+  if (productos.length === 0) {
+    alert("Debe agregar al menos un producto");
+    return;
+  }
+
+  // Crear objeto pedido para enviar
+  const pedido = {
+    proveedorId: proveedor,
+    estado: "PENDIENTE",
+    metodoPago: modoPago,
+    fechaEntrega,
+    total: calcularTotal()
+  };
+
+  try {
     if (isEditing) {
+      // Actualizar pedido existente
+      await ServicePedido.updatePedido(nroPedido, pedido);
+      
+      // Guardar los productos nuevos (los que no tienen ID)
+      const nuevosProductos = productos.filter(p => !p.id);
+      for (const producto of nuevosProductos) {
+        await ServiceDetallePedido.createDetalle({
+          pedidoId: parseInt(nroPedido),
+          modelo: producto.modelo,
+          precioUnitario: producto.precioUnitario,
+          cantidad: producto.cantidad,
+          descripcion: producto.descripcion
+        });
+      }
+      
       alert("Pedido actualizado correctamente");
     } else {
+      // Crear nuevo pedido
+      const response = await ServicePedido.createPedido(pedido);
+      const nuevoPedidoId = response.data.id;
+      
+      // Guardar todos los productos asociados al nuevo pedido
+      for (const producto of productos) {
+        await ServiceDetallePedido.createDetalle({
+          pedidoId: nuevoPedidoId,
+          modelo: producto.modelo,
+          precioUnitario: producto.precioUnitario,
+          cantidad: producto.cantidad,
+          descripcion: producto.descripcion
+        });
+      }
+      
       alert("Pedido guardado correctamente");
+      navigate("/dashboard/proveedores/pedidos");
     }
-    // Aquí puedes agregar la lógica para guardar/actualizar el pedido
-  };
+  } catch (error) {
+    console.error("Error al guardar pedido:", error);
+    alert("Error al guardar pedido, intente nuevamente");
+  }
+};
 
   return (
     <div className="p-2 space-y-4">
@@ -90,12 +262,12 @@ export function NuevoPedido() {
             <SelectValue placeholder="Selecciona un proveedor" />
           </SelectTrigger>
           <SelectContent>
-            {proveedoresRegistrados.map((prov, index) => (
-              <SelectItem key={index} value={prov}>
-                {prov}
-              </SelectItem>
-            ))}
-          </SelectContent>
+            {proveedores.map((proveedor) => (
+           <SelectItem key={proveedor.id} value={proveedor.id}>
+             {proveedor.nombre}
+                </SelectItem>
+              ))}
+            </SelectContent>
         </Select>
       </div>
 
@@ -103,7 +275,7 @@ export function NuevoPedido() {
       <div className="flex items-center space-x-4">
         <label className="text-sm font-semibold">Lista de productos:</label>
         <Dialog open={!!modalData} onOpenChange={(open) => !open && setModalData(null)}>
-          <DialogTrigger>
+          <DialogTrigger asChild>
             <Button className="flex items-center gap-2" onClick={() => setModalData({})} >
               Agregar Producto
             </Button>
@@ -140,7 +312,7 @@ export function NuevoPedido() {
               </TableRow>
             ) : (
               productos.map((producto, index) => (
-                <TableRow key={index}>
+                 <TableRow key={producto.id || `new-${index}`}>
                   <TableCell>{producto.cantidad}</TableCell>
                   <TableCell>{producto.descripcion}</TableCell>
                   <TableCell>{producto.modelo}</TableCell>
