@@ -1,3 +1,4 @@
+//src\pages\panels\Administrador\Inventario\componentes\Modales\VerProducto.jsx
 import * as React from "react"
 import {
   ResizableHandle,

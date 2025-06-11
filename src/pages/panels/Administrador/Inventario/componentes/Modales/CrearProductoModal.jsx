@@ -1,3 +1,4 @@
+//src\pages\panels\Administrador\Inventario\componentes\Modales\CrearProductoModal.jsx
 import { useState } from "react";
 import {
   Card,

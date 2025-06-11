@@ -1,3 +1,4 @@
+//src\pages\panels\Administrador\Ventas\componentes\Modales\Metodopago.jsx
 import * as React from "react";
 import {
   Sheet,

@@ -1,3 +1,4 @@
+//src\pages\panels\Administrador\Ventas\componentes\carrito.jsx
 import * as React from "react"
 import { CircleMinus, CirclePlus, Trash } from "lucide-react"
 import {

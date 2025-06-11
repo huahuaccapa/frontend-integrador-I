@@ -1,3 +1,4 @@
+//src\pages\panels\Administrador\Proveedor\componentes\SheetDemoProveedor.jsx
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { FormProveedor } from "./FormProveedor";

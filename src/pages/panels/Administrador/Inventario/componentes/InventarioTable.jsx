@@ -1,3 +1,4 @@
+//src\pages\panels\Administrador\Inventario\componentes\InventarioTable.jsx
 import React from "react";
 import {
   flexRender,

@@ -1,3 +1,4 @@
+//src\pages\panels\Administrador\Inventario\inventario.jsx
 import React, { useEffect, useState } from "react";
 import Services from "@/api/Services";
 import { InventarioTable } from "./componentes/InventarioTable";

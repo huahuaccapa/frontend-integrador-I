@@ -1,3 +1,4 @@
+//src\pages\panels\Administrador\Inventario\componentes\Modales\EditarProducto.jsx
 import * as React from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"

@@ -1,3 +1,4 @@
+//src\pages\panels\Administrador\Inventario\componentes\columns.jsx
 import { Button } from "@/components/ui/button";
 import { Eye, Pencil, Trash, AlertTriangle } from "lucide-react";
 import {

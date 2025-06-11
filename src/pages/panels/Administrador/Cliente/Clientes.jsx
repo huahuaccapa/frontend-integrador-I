@@ -1,3 +1,4 @@
+//src\pages\panels\Administrador\Cliente\Clientes.jsx
 import { useState, useEffect } from 'react';
 import { ClienteTable } from './Components/ClienteTable/ClienteTable';
 import { RegistrarCliente } from './Components/NewClient';

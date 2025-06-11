@@ -1,3 +1,4 @@
+//src\pages\panels\Administrador\Ventas\ventas.jsx
 import * as React from "react"
 import { useState } from "react"
 import { Catalogo } from "./componentes/Catalogo"

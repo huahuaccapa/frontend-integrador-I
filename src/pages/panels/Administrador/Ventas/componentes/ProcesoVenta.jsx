@@ -1,3 +1,4 @@
+//src\pages\panels\Administrador\Ventas\componentes\ProcesoVenta.jsx
 import * as React from "react"
 import { useState, useEffect } from 'react'
 import axios from 'axios';

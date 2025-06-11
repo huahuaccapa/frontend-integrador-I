@@ -1,3 +1,4 @@
+//src\pages\panels\Administrador\Ventas\componentes\Catalogo.jsx
 import * as React from "react"
 import { useState, useEffect } from "react"
 import { Separator } from "@radix-ui/react-dropdown-menu"

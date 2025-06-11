@@ -1,3 +1,4 @@
+//src\pages\panels\Administrador\Proveedor\componentes\FormPedidos.jsx
 import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";

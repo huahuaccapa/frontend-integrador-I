@@ -1,3 +1,4 @@
+//src\pages\panels\Administrador\Ventas\componentes\VentasTable\colums.jsx
 import { Button } from "@/components/ui/button";
 
 export function getColumns() {
