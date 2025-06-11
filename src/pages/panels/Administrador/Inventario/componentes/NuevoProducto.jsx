@@ -77,8 +77,10 @@ export function Producto() {
         fechaAdquisicion: formatDate(date),
         });
         console.log("Producto guardado", response.data);
+         window.alert("✅ Producto creado exitosamente!");
     } catch (error) {
         console.error("Error al guardar producto:", error);
+          window.alert("❌ Error al crear el producto");
     }
     };
 
