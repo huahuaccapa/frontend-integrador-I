@@ -96,7 +96,7 @@ export function Metodo({ open, onOpenChange, carrito = [], cliente = {}, total =
             <Banknote className="w-14 h-14" />
           </Button>
           <Button
-            className={`bg-green-800 hover:bg-white ho ver:text-black w-15 h-12 ${
+            className={`bg-green-800 hover:bg-white hover:text-black w-15 h-12 ${
               metodoPago === "YAPE" ? "ring-2 ring-white" : ""
             }`}
             onClick={() => setMetodoPago("YAPE")}
