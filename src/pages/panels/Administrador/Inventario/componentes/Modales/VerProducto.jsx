@@ -52,16 +52,18 @@ export function VistaProducto({ producto }) {
             <ResizablePanel defaultSize={75}>
               <div className="flex h-full items-center justify-center p-6 grid grid-rows-2">
                 <div className="grid grid-cols-4 ">
+                    <Label className='mx-4'>Modelo</Label>
                     <Label className='mx-4'>Precio</Label>
                     <Label className='mx-4'>Stock</Label>
                     <Label className='mx-4'>Estado</Label>
-                    <Label className='mx-4'>Venta</Label>
+                    
                 </div>
                 <div className="grid grid-cols-4 m-3">
+                    <Label className='mx-4'>{producto.marca || "N/A"}</Label>
                     <Label className='mx-4'>{producto.precioVenta || "N/A"}</Label>
                     <Label className='mx-4'>{producto.stock || "N/A"}</Label>
                     <Label className='mx-4'>{producto.estado || "N/A"}</Label>
-                    <Label className='mx-8'>120</Label>
+                    
                 </div>
               </div>
             </ResizablePanel>
