@@ -1,4 +1,3 @@
-//src\pages\panels\Administrador\Inventario\componentes\NuevoProducto.jsx
 import { useState, useEffect } from "react"
 import { format } from "date-fns"
 import { Button } from '@/components/ui/button'
@@ -20,12 +19,30 @@ import { cn } from "@/lib/utils"
 import { Trash2, Upload, ImagePlus, CalendarIcon } from "lucide-react"
 import axios from "axios"
 
+const uploadImage = async (file) => {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  try {
+    const response = await axios.post('http://localhost:8080/api/v1/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data.url; // Ejemplo: http://localhost:8080/uploads/filename.jpg
+  } catch (error) {
+    console.error('Error al subir imagen:', error);
+    return null;
+  }
+};
+
 export function Producto() {
   const [date, setDate] = useState()
   const [images, setImages] = useState([])
   const [urlInput, setUrlInput] = useState("")
+  const [isUploading, setIsUploading] = useState(false)
 
-    const [producto, setProducto] = useState({
+  const [producto, setProducto] = useState({
     nombreProducto: "",
     categoria: "",
     precioCompra: "",
@@ -39,19 +56,15 @@ export function Producto() {
     codigo: "",
     fechaAdquisicion: "",
     imagenes: [],
-    })
+  })
 
-
-    useEffect(() => {
+  useEffect(() => {
     setProducto(prev => ({ ...prev, imagenes: images }))
-    }, [images])
+  }, [images])
 
-
-
-    useEffect(() => {
+  useEffect(() => {
     setProducto(prev => ({ ...prev, fechaAdquisicion: date }))
-    }, [date])
-
+  }, [date])
 
   const handleAddUrlImage = () => {
     if (urlInput.trim() !== "") {
@@ -66,24 +79,40 @@ export function Producto() {
     setImages(updated)
   }
 
- const formatDate = (date) => {
-  return date?.toISOString().split("T")[0]; // "YYYY-MM-DD"
-    }
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
 
-    const handleGuardarProducto = async () => {
+    setIsUploading(true);
     try {
-        const response = await axios.post("http://localhost:8080/api/v1/productos", {
+      const imageUrl = await uploadImage(file);
+      if (imageUrl) {
+        setImages(prev => [...prev, imageUrl]);
+      }
+    } catch (error) {
+      console.error("Error uploading image:", error);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const formatDate = (date) => {
+    return date?.toISOString().split("T")[0]; // "YYYY-MM-DD"
+  }
+
+  const handleGuardarProducto = async () => {
+    try {
+      const response = await axios.post("http://localhost:8080/api/v1/productos", {
         ...producto,
         fechaAdquisicion: formatDate(date),
-        });
-        console.log("Producto guardado", response.data);
-         window.alert("✅ Producto creado exitosamente!");
+      });
+      console.log("Producto guardado", response.data);
+      window.alert("✅ Producto creado exitosamente!");
     } catch (error) {
-        console.error("Error al guardar producto:", error);
-          window.alert("❌ Error al crear el producto");
+      console.error("Error al guardar producto:", error);
+      window.alert("❌ Error al crear el producto");
     }
-    };
-
+  };
 
   return (
     <div>
@@ -242,61 +271,83 @@ export function Producto() {
         </div>
 
         {/* PANEL DE IMÁGENES */}
-       <div className="w-2/3 max-w-md mx-auto bg-emerald-400 rounded-2xl p-4 shadow-md space-y-4">
-        {images[0] && (
-          <div className="w-full aspect-square rounded-xl overflow-hidden relative">
-            <img src={images[0]} alt="Imagen principal" className="object-cover w-full h-full" />
-            <div className="absolute top-2 right-2 flex space-x-2">
-              <button className="bg-white p-1 rounded-md shadow hover:bg-gray-100">
-                <Upload size={16} />
-              </button>
-              <button onClick={() => handleDelete(0)} className="bg-white p-1 rounded-md shadow hover:bg-gray-100">
-                <Trash2 size={16} />
-              </button>
-            </div>
-          </div>
-        )}
-
-        <h2 className="text-lg font-semibold">Imágenes Adicionales</h2>
-
-        <div className="flex flex-wrap gap-4">
-          {images.slice(1).map((img, idx) => (
-            <div key={idx} className="relative size-24 rounded-xl overflow-hidden shadow bg-white">
-              <img src={img} alt={`img-${idx}`} className="object-cover w-full h-full" />
-              <div className="absolute top-1 right-1 flex space-x-1">
-                <button className="bg-white p-0.5 rounded hover:bg-gray-100">
-                  <Upload size={14} />
-                </button>
-                <button onClick={() => handleDelete(idx + 1)} className="bg-white p-0.5 rounded hover:bg-gray-100">
-                  <Trash2 size={14} />
+        <div className="w-2/3 max-w-md mx-auto bg-emerald-400 rounded-2xl p-4 shadow-md space-y-4">
+          {images[0] && (
+            <div className="w-full aspect-square rounded-xl overflow-hidden relative">
+              <img src={images[0]} alt="Imagen principal" className="object-cover w-full h-full" />
+              <div className="absolute top-2 right-2 flex space-x-2">
+                <label className="bg-white p-1 rounded-md shadow hover:bg-gray-100 cursor-pointer">
+                  <Upload size={16} />
+                  <input 
+                    type="file" 
+                    className="hidden" 
+                    onChange={handleFileUpload}
+                    accept="image/*"
+                  />
+                </label>
+                <button onClick={() => handleDelete(0)} className="bg-white p-1 rounded-md shadow hover:bg-gray-100">
+                  <Trash2 size={16} />
                 </button>
               </div>
             </div>
-          ))}
+          )}
 
-          {/* Mantiene diseño, pero ahora solo visual */}
-          <div
-            onClick={() => document.getElementById("url-input").focus()}
-            className="size-24 rounded-xl border-2 border-dashed flex flex-col items-center justify-center cursor-pointer hover:bg-emerald-300 transition"
-          >
-            <ImagePlus size={20} />
-            <span className="text-xs text-center mt-1">Agregar imagen</span>
+          {!images[0] && (
+            <div className="w-full aspect-square rounded-xl border-2 border-dashed flex flex-col items-center justify-center cursor-pointer hover:bg-emerald-300 transition relative">
+              <label className="flex flex-col items-center justify-center w-full h-full">
+                <ImagePlus size={32} />
+                <span className="text-sm mt-2">Agregar imagen principal</span>
+                <input 
+                  type="file" 
+                  className="hidden" 
+                  onChange={handleFileUpload}
+                  accept="image/*"
+                />
+              </label>
+            </div>
+          )}
+
+          <h2 className="text-lg font-semibold">Imágenes Adicionales</h2>
+
+          <div className="flex flex-wrap gap-4">
+            {images.slice(1).map((img, idx) => (
+              <div key={idx} className="relative size-24 rounded-xl overflow-hidden shadow bg-white">
+                <img src={img} alt={`img-${idx}`} className="object-cover w-full h-full" />
+                <div className="absolute top-1 right-1 flex space-x-1">
+                  <button onClick={() => handleDelete(idx + 1)} className="bg-white p-0.5 rounded hover:bg-gray-100">
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              </div>
+            ))}
+
+            {images.length < 5 && (
+              <label className="size-24 rounded-xl border-2 border-dashed flex flex-col items-center justify-center cursor-pointer hover:bg-emerald-300 transition">
+                <ImagePlus size={20} />
+                <span className="text-xs text-center mt-1">Agregar imagen</span>
+                <input 
+                  type="file" 
+                  className="hidden" 
+                  onChange={handleFileUpload}
+                  accept="image/*"
+                />
+              </label>
+            )}
+          </div>
+
+          {/* Input para URL de imagen */}
+          <div className="flex gap-2">
+            <Input
+              id="url-input"
+              type="text"
+              placeholder="Pegar URL de imagen"
+              value={urlInput}
+              onChange={(e) => setUrlInput(e.target.value)}
+            />
+            <Button variant="secondary" onClick={handleAddUrlImage}>Agregar</Button>
           </div>
         </div>
-
-        {/* Input para URL de imagen */}
-        <div className="flex gap-2">
-          <Input
-            id="url-input"
-            type="text"
-            placeholder="Pegar URL de imagen"
-            value={urlInput}
-            onChange={(e) => setUrlInput(e.target.value)}
-          />
-          <Button variant="secondary" onClick={handleAddUrlImage}>Agregar</Button>
-        </div>
       </div>
-    </div>
     </div>
   )
 }
