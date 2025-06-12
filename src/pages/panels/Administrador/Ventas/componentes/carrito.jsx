@@ -15,7 +15,7 @@ import { useNavigate } from "react-router-dom"
 
 export default function Carrito({ open, onOpenChange, carrito, onRemove, onIncrease, onDecrease }) {
   const subtotal = carrito.reduce(
-    (total, item) => total + item.precioCompra * item.cantidad,
+    (total, item) => total + item.precioVenta * item.cantidad,
     0
   )
   const navigate = useNavigate()
@@ -42,7 +42,7 @@ export default function Carrito({ open, onOpenChange, carrito, onRemove, onIncre
                   />
                   <div className="flex-1 space-y-1">
                     <h3 className="font-medium truncate">{item.nombreProducto}</h3>
-                    <p className="text-lg font-semibold">S/ {item.precioCompra}</p>
+                    <p className="text-lg font-semibold">S/ {item.precioVenta}</p>
                     <div className="flex items-center gap-3 mt-2">
                       <Button
                         size="icon"

@@ -105,7 +105,7 @@ export function Catalogo({ onAbrir, carrito, agregarAlCarrito }) {
               />
               <p className="font-medium text-gray-800">{producto.nombreProducto}</p>
               <div className="flex justify-between items-center mt-3">
-                <span className="text-green-600 font-bold">${producto.precioCompra}</span>
+                <span className="text-green-600 font-bold">${producto.precioVenta}</span>
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
