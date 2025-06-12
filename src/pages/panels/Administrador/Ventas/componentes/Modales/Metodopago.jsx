@@ -20,6 +20,8 @@ export function Metodo({ open, onOpenChange, carrito = [], cliente = {}, total =
   const navigate = useNavigate();
   const [metodoPago, setMetodoPago] = React.useState("EFECTIVO");
 
+
+
    const handlePagar = async () => {
     // Validación del cliente
     if (!cliente?.id) {
@@ -94,10 +96,10 @@ export function Metodo({ open, onOpenChange, carrito = [], cliente = {}, total =
             <Banknote className="w-14 h-14" />
           </Button>
           <Button
-            className={`bg-green-800 hover:bg-white hover:text-black w-15 h-12 ${
-              metodoPago === "APP" ? "ring-2 ring-white" : ""
+            className={`bg-green-800 hover:bg-white ho ver:text-black w-15 h-12 ${
+              metodoPago === "YAPE" ? "ring-2 ring-white" : ""
             }`}
-            onClick={() => setMetodoPago("APP")}
+            onClick={() => setMetodoPago("YAPE")}
           >
             <img
               src="https://marketing-peru.beglobal.biz/wp-content/uploads/2025/01/logo-yape-color-negro.png"
@@ -114,7 +116,7 @@ export function Metodo({ open, onOpenChange, carrito = [], cliente = {}, total =
             <CreditCard className="w-14 h-14" />
           </Button>
           <Label>Efectivo</Label>
-          <Label>App</Label>
+          <Label>Yape</Label>
           <Label>Tarjeta</Label>
         </div>
 
