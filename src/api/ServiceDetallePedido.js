@@ -24,9 +24,9 @@
         }
 
         // Eliminar detalle
-        deleteDetalle(id) {
-            return axios.delete(`${DETALLE_PEDIDO_BASE_REST_API_URL}/${id}`);
-        }
+      deleteDetalle(id) {
+    return axios.delete(`${DETALLE_PEDIDO_BASE_REST_API_URL}/${id}`, );
+}
 
         getDetallesByPedidoId(pedidoId) {
         return axios.get(`${DETALLE_PEDIDO_BASE_REST_API_URL}/pedido/${pedidoId}`);
