@@ -1,12 +1,9 @@
-//src\pages\panels\Administrador\Ventas\componentes\Catalogo.jsx
 import * as React from "react"
 import { useState, useEffect } from "react"
 import { Separator } from "@radix-ui/react-dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { ShoppingCart } from "lucide-react"
-
-
 import {
   Tooltip,
   TooltipContent,
@@ -26,28 +23,31 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination"
-
-// Importa tu servicio que trae productos desde la API
 import Services from "@/api/Services"
 
 export function Catalogo({ onAbrir, carrito, agregarAlCarrito }) {
   const [busqueda, setBusqueda] = useState("")
   const [paginaActual, setPaginaActual] = useState(1)
-  const [productos, setProductos] = useState([])  // Aquí guardaremos productos del backend
+  const [productos, setProductos] = useState([])
   const productosPorPagina = 8
 
-  // Traer productos del backend cuando el componente carga
   useEffect(() => {
     Services.getAllProductos()
       .then((response) => {
-        setProductos(response.data)
+        // Asegurarse que cada producto tenga su imagen correctamente formada
+        const productosConImagenes = response.data.map(producto => ({
+          ...producto,
+          imagen: producto.imagenes && producto.imagenes.length > 0 
+            ? producto.imagenes[0] // Tomar la primera imagen
+            : "/placeholder-product.png" // Imagen por defecto si no hay
+        }));
+        setProductos(productosConImagenes)
       })
       .catch((error) => {
         console.error("Error al obtener productos:", error)
       })
   }, [])
 
-  // Filtrar productos según búsqueda
   const productosFiltrados = productos.filter((p) =>
     p.nombreProducto.toLowerCase().includes(busqueda.toLowerCase())
   )
@@ -67,7 +67,6 @@ export function Catalogo({ onAbrir, carrito, agregarAlCarrito }) {
       <h2 className="text-2xl font-semibold text-gray-800 mb-2">Catálogo de Productos</h2>
       <Separator className="my-4" />
 
-      {/* Buscador y botón carrito */}
       <div className="flex items-center gap-4 w-full md:w-2/3 mb-6">
         <Input
           type="text"
@@ -90,7 +89,6 @@ export function Catalogo({ onAbrir, carrito, agregarAlCarrito }) {
         </Button>
       </div>
 
-      {/* Catálogo productos */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {productosPaginados.map((producto) => (
           <Card
@@ -98,11 +96,17 @@ export function Catalogo({ onAbrir, carrito, agregarAlCarrito }) {
             className="transition-transform duration-300 hover:scale-105 hover:shadow-lg"
           >
             <CardContent className="p-4">
-              <img
-                src={producto.imagen}
-                alt={producto.nombreProducto}
-                className="rounded-lg object-cover h-48 w-full mb-3"
-              />
+              <div className="h-48 w-full mb-3 overflow-hidden rounded-lg bg-gray-100 flex items-center justify-center">
+                <img
+                  src={producto.imagen}
+                  alt={producto.nombreProducto}
+                  className="object-contain h-full w-full"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = "/placeholder-product.png";
+                  }}
+                />
+              </div>
               <p className="font-medium text-gray-800">{producto.nombreProducto}</p>
               <div className="flex justify-between items-center mt-3">
                 <span className="text-green-600 font-bold">${producto.precioVenta}</span>
@@ -129,7 +133,6 @@ export function Catalogo({ onAbrir, carrito, agregarAlCarrito }) {
         ))}
       </div>
 
-      {/* Paginación */}
       <div className="mt-8 flex justify-center">
         <Pagination>
           <PaginationContent>
