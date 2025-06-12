@@ -1,145 +1,320 @@
-//src\pages\panels\Administrador\Inventario\componentes\Modales\CrearProductoModal.jsx
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-  CardFooter,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useToast } from "@/components/ui/use-toast";
+import { Trash2, ImagePlus } from "lucide-react";
+import axios from "axios";
 
-export function CrearProductoModal({ onGuardar }) {
-  const [nombre, setNombre] = useState("");
-  const [precio, setPrecio] = useState("");
-  const [stock, setStock] = useState("");
-  const [estado, setEstado] = useState("OPTIMO");
-  const [tipo, setTipo] = useState("ACCESORIO");
-  const { toast } = useToast();
+// Servicio de subida de imágenes
+import uploadImage from "@/api/upload";
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+export function CrearProductoModal({ open, onOpenChange, onGuardar }) {
+  const [producto, setProducto] = useState({
+    nombreProducto: "",
+    categoria: "",
+    precioCompra: "",
+    precioVenta: "",
+    stock: "",
+    stockMinimo: "",
+    stockMaximo: "",
+    marca: "",
+    estado: "",
+    descripcion: "",
+    codigo: "",
+    imagenes: [],
+  });
 
-    if (!nombre.trim() || !precio || isNaN(parseFloat(precio)) || !stock || isNaN(parseInt(stock))) {
-      toast({
-        title: "Error",
-        description: "Todos los campos son obligatorios",
-        variant: "destructive",
+  const [images, setImages] = useState([]);
+  const [urlInput, setUrlInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      // Reiniciar formulario al abrir
+      setProducto({
+        nombreProducto: "",
+        categoria: "",
+        precioCompra: "",
+        precioVenta: "",
+        stock: "",
+        stockMinimo: "",
+        stockMaximo: "",
+        marca: "",
+        estado: "",
+        descripcion: "",
+        codigo: "",
+        imagenes: [],
       });
+      setImages([]);
+      setUrlInput("");
+    }
+  }, [open]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setProducto((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleAddImage = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setIsLoading(true);
+    const imageUrl = await uploadImage(file);
+    setIsLoading(false);
+
+    if (imageUrl) {
+      setImages((prev) => [...prev, imageUrl]);
+    }
+  };
+
+  const handleAddUrlImage = () => {
+    if (urlInput.trim() !== "") {
+      setImages((prev) => [...prev, urlInput.trim()]);
+      setUrlInput("");
+    }
+  };
+
+  const handleDeleteImage = (index) => {
+    const updated = [...images];
+    updated.splice(index, 1);
+    setImages(updated);
+  };
+
+  const handleSubmit = async () => {
+    if (!producto.nombreProducto.trim() || !producto.codigo.trim()) {
+      alert("Nombre y código son obligatorios");
       return;
     }
 
-    const nuevoProducto = {
-      nombreProducto: nombre.trim(),
-      precio: parseFloat(precio),
-      stock: parseInt(stock),
-      estadoStock: estado,
-      tipoProducto: tipo,
-    };
+    try {
+      const response = await axios.post(
+        "http://localhost:8080/api/v1/productos",
+        {
+          ...producto,
+          imagenes: images,
+        }
+      );
 
-    onGuardar(nuevoProducto);
-  };
-
-  const formatPrecio = (value) => {
-    const numericValue = value.replace(/[^0-9.]/g, '');
-    const parts = numericValue.split('.');
-    if (parts.length > 2) {
-      return parts[0] + '.' + parts.slice(1).join('');
+      onGuardar(response.data);
+      onOpenChange(false);
+    } catch (error) {
+      console.error("Error al guardar producto:", error);
+      alert("Hubo un error al guardar el producto");
     }
-    return numericValue;
   };
 
   return (
-    <Card className="border-0 shadow-none">
-      <CardHeader>
-        <CardTitle className="text-lg">producto</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="grid gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="nombre">Nombre del Producto*</Label>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="p-4 bg-white max-w-3xl">
+        <DialogHeader>
+          <DialogTitle className="text-xl font-semibold">
+            Agregar Nuevo Producto
+          </DialogTitle>
+        </DialogHeader>
+
+        {/* Campos del formulario */}
+        <div className="grid gap-4">
+          <div className="grid grid-cols-4 items-center gap-4">
+            <label htmlFor="codigo" className="text-right text-gray-700">
+              Código:
+            </label>
             <Input
-              id="nombre"
-              value={nombre}
-              onChange={(e) => setNombre(e.target.value)}
-              placeholder="Ej: Batería A14"
-              required
+              id="codigo"
+              name="codigo"
+              value={producto.codigo}
+              onChange={handleChange}
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="precio">Precio (S/)*</Label>
-              <Input
-                id="precio"
-                type="text"
-                value={precio}
-                onChange={(e) => setPrecio(formatPrecio(e.target.value))}
-                placeholder="0.00"
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="stock">Stock*</Label>
-              <Input
-                id="stock"
-                type="number"
-                min="0"
-                value={stock}
-                onChange={(e) => setStock(e.target.value)}
-                placeholder="0"
-                required
-              />
-            </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <label
+              htmlFor="nombreProducto"
+              className="text-right text-gray-700"
+            >
+              Nombre:
+            </label>
+            <Input
+              id="nombreProducto"
+              name="nombreProducto"
+              value={producto.nombreProducto}
+              onChange={handleChange}
+            />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="tipo">Tipo de Producto*</Label>
-              <Select value={tipo} onValueChange={setTipo}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecciona un tipo" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ACCESORIO">Accesorio</SelectItem>
-                  <SelectItem value="REPUESTO">Repuesto</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="estado">Estado Stock*</Label>
-              <Select value={estado} onValueChange={setEstado}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecciona un estado" />
-                </SelectTrigger>
-                <SelectContent>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <label htmlFor="categoria" className="text-right text-gray-700">
+              Categoría:
+            </label>
+            <Select
+              name="categoria"
+              value={producto.categoria}
+              onValueChange={(value) =>
+                setProducto((prev) => ({ ...prev, categoria: value }))
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Selecciona una categoría" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Categorías</SelectLabel>
+                  <SelectItem value="accesorios">Accesorios</SelectItem>
+                  <SelectItem value="electronica">Electrónica</SelectItem>
+                  <SelectItem value="ropa">Ropa</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="grid grid-cols-4 items-center gap-4">
+            <label htmlFor="precioCompra" className="text-right text-gray-700">
+              Precio Compra:
+            </label>
+            <Input
+              id="precioCompra"
+              name="precioCompra"
+              type="number"
+              value={producto.precioCompra}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="grid grid-cols-4 items-center gap-4">
+            <label htmlFor="precioVenta" className="text-right text-gray-700">
+              Precio Venta:
+            </label>
+            <Input
+              id="precioVenta"
+              name="precioVenta"
+              type="number"
+              value={producto.precioVenta}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="grid grid-cols-4 items-center gap-4">
+            <label htmlFor="stock" className="text-right text-gray-700">
+              Stock:
+            </label>
+            <Input
+              id="stock"
+              name="stock"
+              type="number"
+              value={producto.stock}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="grid grid-cols-4 items-center gap-4">
+            <label htmlFor="marca" className="text-right text-gray-700">
+              Marca:
+            </label>
+            <Input
+              id="marca"
+              name="marca"
+              value={producto.marca}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="grid grid-cols-4 items-center gap-4">
+            <label htmlFor="estado" className="text-right text-gray-700">
+              Estado:
+            </label>
+            <Select
+              name="estado"
+              value={producto.estado}
+              onValueChange={(value) =>
+                setProducto((prev) => ({ ...prev, estado: value }))
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Selecciona un estado" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Estado</SelectLabel>
                   <SelectItem value="OPTIMO">Óptimo</SelectItem>
                   <SelectItem value="MEDIO">Medio</SelectItem>
                   <SelectItem value="BAJO">Bajo</SelectItem>
-                </SelectContent>
-              </Select>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Imágenes */}
+          <div className="mt-4">
+            <label className="block text-sm font-medium mb-2">Imágenes</label>
+            <div className="flex flex-wrap gap-2 mb-2">
+              {images.map((img, idx) => (
+                <div
+                  key={idx}
+                  className="relative w-20 h-20 rounded overflow-hidden border"
+                >
+                  <img
+                    src={img}
+                    alt={`preview-${idx}`}
+                    className="w-full h-full object-cover"
+                  />
+                  <button
+                    onClick={() => handleDeleteImage(idx)}
+                    className="absolute top-0 right-0 bg-red-500 text-white p-1 rounded-full"
+                  >
+                    <Trash2 size={12} />
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex items-center gap-2">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleAddImage}
+                disabled={isLoading}
+              />
+              <span className="text-xs text-gray-500">
+                {isLoading ? "Subiendo..." : ""}
+              </span>
+            </div>
+
+            {/* Añadir por URL */}
+            <div className="flex gap-2 mt-2">
+              <Input
+                placeholder="Pegar URL de imagen"
+                value={urlInput}
+                onChange={(e) => setUrlInput(e.target.value)}
+              />
+              <Button variant="secondary" onClick={handleAddUrlImage}>
+                Agregar
+              </Button>
             </div>
           </div>
-        </form>
-      </CardContent>
-      <CardFooter className="flex justify-end gap-2 pt-4 border-t">
-        <Button variant="outline" onClick={() => onGuardar(null)}>
-          Cancelar
-        </Button>
-        <Button type="submit" onClick={handleSubmit}>
-          Crear producto
-        </Button>
-      </CardFooter>
-    </Card>
+
+          <Button
+            onClick={handleSubmit}
+            className="bg-black text-white mt-4"
+            disabled={isLoading}
+          >
+            Guardar Producto
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
