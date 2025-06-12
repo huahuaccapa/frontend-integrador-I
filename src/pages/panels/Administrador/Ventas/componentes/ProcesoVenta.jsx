@@ -79,66 +79,100 @@ export function ProcesoVenta(){
     }, []);
 
     const handlePagar = async (metodoPago) => {
-        if (!cliente.id) {
-            toast.error("Seleccione un cliente antes de pagar");
-            return;
+    if (!cliente.id) {
+        toast.error("Seleccione un cliente antes de pagar");
+        return;
+    }
+
+    if (productos.length === 0) {
+        toast.error("No hay productos en el carrito");
+        return;
+    }
+
+    setIsLoading(true);
+    
+    try {
+        // Verificar stock antes de proceder (opcional)
+        const verificacionStock = await Promise.all(
+            productos.map(async producto => {
+                const response = await axios.get(`http://localhost:8080/api/productos/${producto.id}/stock`);
+                return {
+                    id: producto.id,
+                    nombre: producto.nombre,
+                    stockDisponible: response.data.stock,
+                    cantidadSolicitada: producto.cantidad
+                };
+            })
+        );
+
+        const productosSinStock = verificacionStock.filter(
+            item => item.stockDisponible < item.cantidadSolicitada
+        );
+
+        if (productosSinStock.length > 0) {
+            throw new Error(
+                `Stock insuficiente para: ${productosSinStock.map(p => p.nombre).join(', ')}`
+            );
         }
 
-        if (productos.length === 0) {
-            toast.error("No hay productos en el carrito");
-            return;
-        }
+        // Crear objeto venta
+        const venta = {
+            cliente: {
+                id: cliente.id,
+                nombre: cliente.nombre,
+                apellidos: cliente.apellido,
+                identificacion: cliente.documento
+            },
+            detallesVenta: productos.map(producto => ({
+                productoId: producto.id,
+                cantidad: producto.cantidad,
+                precioUnitario: producto.precio,
+                subtotal: producto.precio * producto.cantidad
+            })),
+            metodoPago: metodoPago,
+            total: total,
+            fechaVenta: new Date().toISOString()
+        };
 
-        setIsLoading(true);
+        // Enviar la venta al backend
+        await VentaService.crearVenta(venta);
         
-        try {
-            // Crear objeto venta
-            const venta = {
-                cliente: {
-                    id: cliente.id,
-                    nombre: cliente.nombre,
-                    apellidos: cliente.apellido,
-                    identificacion: cliente.documento
-                },
-                detallesVenta: productos.map(producto => ({
-                    productoId: producto.id,
-                    cantidad: producto.cantidad,
-                    precioUnitario: producto.precio,
-                    subtotal: producto.precio * producto.cantidad
-                })),
-                metodoPago: metodoPago,
-                total: total,
-                fechaVenta: new Date().toISOString()
-            };
+        toast.success("Venta registrada exitosamente!");
+        
+        // Actualizar el estado local del stock (opcional)
+        setProductos(prev => prev.map(p => {
+            const productoActualizado = verificacionStock.find(item => item.id === p.id);
+            return productoActualizado ? {
+                ...p,
+                stock: productoActualizado.stockDisponible - p.cantidad
+            } : p;
+        }));
 
-            // Enviar la venta al backend
-            await ServiceVentas.crearVenta(venta);
+        // Redirigir después de éxito
+        setTimeout(() => navigate("/dashboard/ventas"), 2000);
+        
+    } catch (error) {
+        console.error("Error al registrar la venta:", error);
+        
+        const mensajeError = error.response?.data?.includes("Stock insuficiente") 
+            ? error.response.data 
+            : `Error al registrar la venta: ${error.message}`;
             
-            // Mostrar notificación de éxito
-            toast.success("Venta registrada exitosamente!");
-            
-            // Limpiar el estado y redirigir
-            setProductos([]);
-            setCliente({
-                id: null,
-                nombre: '',
-                apellido: '',
-                documento: ''
+        toast.error(mensajeError);
+        
+        // Mostrar detalles adicionales en consola para debug
+        if (error.response) {
+            console.error("Detalles del error:", {
+                status: error.response.status,
+                data: error.response.data,
+                headers: error.response.headers
             });
-            
-            // Redirigir después de 2 segundos
-            setTimeout(() => {
-                navigate("/dashboard/ventas");
-            }, 2000);
-            
-        } catch (error) {
-            console.error("Error al registrar la venta:", error);
-            toast.error("Error al registrar la venta: " + (error.response?.data?.message || error.message));
-        } finally {
-            setIsLoading(false);
-            setOpen(false); // Cerrar el modal de pago
         }
-    };
+    } finally {
+        setIsLoading(false);
+        setOpen(false);
+    }
+};
 
     return (
         <div>
