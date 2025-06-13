@@ -9,6 +9,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Package, PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { Toaster } from "@/components/ui/toaster"; // Agregado: Toaster local
 
 export function Inventario() {
   const [productos, setProductos] = useState([]);
@@ -42,6 +43,38 @@ export function Inventario() {
   useEffect(() => {
     cargarProductos();
   }, []);
+
+  // MEJORADO: Función separada para manejar eliminación con mejor manejo de errores
+  const handleEliminarProducto = async (producto) => {
+    const nombreProducto = producto.nombreProducto || producto.producto;
+    
+    if (!confirm(`¿Seguro que deseas eliminar "${nombreProducto}"?`)) {
+      return;
+    }
+
+    try {
+      await Services.eliminarProducto(producto.id);
+      // Si llegamos aquí, la eliminación fue exitosa
+      cargarProductos();
+      toast({
+        title: "Producto eliminado",
+        description: `"${nombreProducto}" fue eliminado correctamente`,
+      });
+    } catch (error) {
+      console.error("Error al eliminar producto:", error);
+      
+      // Mejor manejo del mensaje de error basado en la respuesta del servidor
+      const mensajeError = error.response?.status === 500 
+        ? "No se pudo eliminar el producto porque está asociado con la venta de un cliente existente"
+        : error.response?.data || "Error al eliminar el producto";
+      
+      toast({
+        title: "Error",
+        description: mensajeError,
+        variant: "destructive",
+      });
+    }
+  };
 
   const handleCrearProducto = (nuevoProducto) => {
     if (!nuevoProducto) {
@@ -82,7 +115,6 @@ export function Inventario() {
       });
   };
 
-  
   return (
     <div className="w-full p-6">
       <div className="flex items-center justify-between mb-6">
@@ -90,8 +122,8 @@ export function Inventario() {
           <Package className="h-6 w-6 text-primary" />
           <h1 className="text-2xl font-bold">Gestión de Inventario</h1>
         </div>
-       <Button onClick={() => navigate("/dashboard/inventario/crearproducto")} className="gap-2">
-        {/* Este btn te lleva a crear */}
+        <Button onClick={() => navigate("/dashboard/inventario/crearproducto")} className="gap-2">
+          {/* Este btn te lleva a crear */}
           <PlusCircle className="h-4 w-4" />
           Nuevo Producto
         </Button>
@@ -109,38 +141,22 @@ export function Inventario() {
             setSelectedProducto(producto);
             setModalType("editar");
           }}
-          onEliminar={(producto) => {
-            if (confirm(`¿Seguro que deseas eliminar "${producto.nombreProducto || producto.producto}"?`)) {
-              Services.eliminarProducto(producto.id).then(() => {
-                cargarProductos();
-                toast({
-                  title: "Producto eliminado",
-                  description: `"${producto.nombreProducto || producto.producto}" fue eliminado correctamente`,
-                });
-              }).catch(() => {
-                toast({
-                  title: "Error",
-                  description: "No se pudo eliminar el producto",
-                  variant: "destructive",
-                });
-              });
-            }
-          }}
+          onEliminar={handleEliminarProducto} // CAMBIADO: Usar la función mejorada
         />
       </div>
 
-     {modalType === "ver" && selectedProducto && (
-  <ProductoModal
-    open={true}
-    onOpenChange={(open) => {
-      if (!open) {
-        setModalType("");
-        setSelectedProducto(null);
-      }
-    }}
-    title="Detalles del Producto"
-  >
-    <VistaProducto producto={selectedProducto} />
+      {modalType === "ver" && selectedProducto && (
+        <ProductoModal
+          open={true}
+          onOpenChange={(open) => {
+            if (!open) {
+              setModalType("");
+              setSelectedProducto(null);
+            }
+          }}
+          title="Detalles del Producto"
+        >
+          <VistaProducto producto={selectedProducto} />
         </ProductoModal>
       )}
 
@@ -184,7 +200,8 @@ export function Inventario() {
         />
       )}
 
-     
+      {/* AGREGADO: Toaster local para este componente */}
+      <Toaster />
     </div>
   );
 }
