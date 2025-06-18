@@ -1,3 +1,4 @@
+//src\pages\panels\Administrador\Proveedor\componentes\TableDemoProveedor.jsx
 import { Button } from "@/components/ui/button";
 import {
   Table,

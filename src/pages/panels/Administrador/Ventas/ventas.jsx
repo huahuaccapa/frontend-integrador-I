@@ -1,3 +1,4 @@
+//src\pages\panels\Administrador\Ventas\ventas.jsx
 import * as React from "react"
 import { useState } from "react"
 import { Catalogo } from "./componentes/Catalogo"
@@ -8,22 +9,19 @@ export function Ventas() {
   const [carrito, setCarrito] = useState([])
 
   // Función para agregar productos al carrito
-  const agregarProductoAlCarrito = (producto) => {
-  const precioNumerico = producto.precio
-
-
+const agregarProductoAlCarrito = (producto) => {
   setCarrito((prev) => {
-    const existente = prev.find((p) => p.nombre === producto.nombre)
+    const existente = prev.find((p) => p.id === producto.id); // Compara por ID, no por nombre
     if (existente) {
       return prev.map((p) =>
-        p.nombre === producto.nombre
+        p.id === producto.id
           ? { ...p, cantidad: p.cantidad + 1 }
           : p
-      )
+      );
     }
-    return [...prev, { ...producto, precio: precioNumerico, cantidad: 1 }]
-  })
-}
+    return [...prev, { ...producto, cantidad: 1 }]; // No necesitas redefinir el precio
+  });
+};
 
 
   // Aumentar cantidad

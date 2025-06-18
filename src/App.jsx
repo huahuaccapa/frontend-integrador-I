@@ -11,34 +11,41 @@ import {Ventas} from './pages/panels/Administrador/Ventas/ventas'
 import { ProcesoVenta } from './pages/panels/Administrador/Ventas/componentes/ProcesoVenta';
 import { Toaster } from "@/components/ui/sonner";
 
+import CreateUser from './pages/general/login/components/CreateUser';
+import ForgotPassword from './pages/general/login/components/ForgotPassword';
+import Profile from './pages/general/login/components/Profile';
+
+
 function App() {
   return (
     <div className='bg-yellow-300'>
-    <Router>
-      <Routes>
-        {/* Ruta principal muestra el Login */}
-        <Route path="/" element={<Login />} />
+      <Router>
+        <Routes>
+          {/* Ruta principal muestra el Login */}
+          <Route path="/" element={<Login />} />
 
-        {/* Rutas protegidas dentro del dashboard */}
-        <Route path="/dashboard" element={<DashboardLayout />}>
-          <Route path="clientes" element={<Clientes />} />
-          {/* Agrega más rutas aquí si deseas */}
-          <Route path="inventario" element={<Inventario/>}/>
-          <Route path="ventas" element={<Ventas/>}/>
-          <Route path="proveedores" element={<Proveedores/>} />
+          {/* Rutas protegidas dentro del dashboard */}
+          <Route path="/dashboard" element={<DashboardLayout />}>
+            <Route path="clientes" element={<Clientes />} />
+            <Route path="inventario" element={<Inventario />} />
+            <Route path="ventas" element={<Ventas />} />
+            <Route path="proveedores" element={<Proveedores />} />
+            <Route path="inventario/crearproducto" element={<Producto />} />
+            <Route path="ventas/detalle" element={<ProcesoVenta />} />
+            <Route path="proveedores/pedidos" element={<Pedido />} />
+            <Route path="proveedores/pedidos/nuevo" element={<NuevoPedido />} />
+          </Route>
 
-          
-          <Route path="/dashboard/inventario/crearproducto" element={<Producto/>}/> 
-          <Route path="/dashboard/ventas/detalle" element={<ProcesoVenta />} /> 
-          <Route path="/dashboard/ventas" element={<Ventas/>}/>
-           <Route path="/dashboard/proveedores/pedidos" element={<Pedido/>}/> 
-          <Route path="/dashboard/proveedores/pedidos/nuevo" element={<NuevoPedido/>}/> 
-        </Route>
-      </Routes>
-    </Router>
-    <Toaster />
+          {/* Rutas de nivel superior */}
+          <Route path="/recuperar-contrasena" element={<ForgotPassword />} />
+          <Route path="/admin/crear-usuario" element={<CreateUser />} />
+          <Route path="/perfil" element={<Profile />} />
+        </Routes>
+      </Router>
+      <Toaster />
     </div>
   );
 }
+
 
 export default App;

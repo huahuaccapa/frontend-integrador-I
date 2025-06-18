@@ -1,3 +1,4 @@
+//src\pages\panels\Administrador\Ventas\componentes\Modales\Metodopago.jsx
 import * as React from "react";
 import {
   Sheet,
@@ -18,6 +19,8 @@ import ServiceVentas from "@/api/ServiceVentas";
 export function Metodo({ open, onOpenChange, carrito = [], cliente = {}, total = 0 }) {
   const navigate = useNavigate();
   const [metodoPago, setMetodoPago] = React.useState("EFECTIVO");
+
+
 
    const handlePagar = async () => {
     // Validación del cliente
@@ -94,9 +97,9 @@ export function Metodo({ open, onOpenChange, carrito = [], cliente = {}, total =
           </Button>
           <Button
             className={`bg-green-800 hover:bg-white hover:text-black w-15 h-12 ${
-              metodoPago === "APP" ? "ring-2 ring-white" : ""
+              metodoPago === "YAPE" ? "ring-2 ring-white" : ""
             }`}
-            onClick={() => setMetodoPago("APP")}
+            onClick={() => setMetodoPago("YAPE")}
           >
             <img
               src="https://marketing-peru.beglobal.biz/wp-content/uploads/2025/01/logo-yape-color-negro.png"
@@ -113,7 +116,7 @@ export function Metodo({ open, onOpenChange, carrito = [], cliente = {}, total =
             <CreditCard className="w-14 h-14" />
           </Button>
           <Label>Efectivo</Label>
-          <Label>App</Label>
+          <Label>Yape</Label>
           <Label>Tarjeta</Label>
         </div>
 

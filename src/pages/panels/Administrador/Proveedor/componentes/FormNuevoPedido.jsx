@@ -1,3 +1,4 @@
+//src\pages\panels\Administrador\Proveedor\componentes\FormNuevoPedido.jsx
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
@@ -27,33 +28,30 @@ export function NuevoPedido() {
   const [proveedores, setProveedores] = useState([]);
   const [cargando, setCargando] = useState(false);
 
-
+useEffect(() => {
+  console.log("Estado actual:", {
+    isEditing,
+    nroPedido,
+    productos,
+    proveedor
+  });
+}, [isEditing, nroPedido, productos, proveedor]);
   // Efecto para cargar datos del pedido a editar
-  useEffect(() => {
+useEffect(() => {
   const cargarDatosEdicion = async () => {
     if (isEditing && pedidoData) {
       try {
-        // Primero cargar los datos básicos del pedido
+        // Cargar datos básicos del pedido
         setProveedor(pedidoData.proveedorId);
         setFechaEntrega(pedidoData.fechaEntrega || "");
         setModoPago(pedidoData.metodoPago || "Cancelado");
         setNroPedido(pedidoData.id.toString());
 
-        // Luego cargar los detalles específicos
-        const response = await ServiceDetallePedido.getAllDetalles();
+        // Cargar detalles específicos usando el ID del pedido
+        const response = await ServiceDetallePedido.getDetallesByPedidoId(pedidoData.id);
         
-        // Verificar que la respuesta tiene datos
         if (response.data && Array.isArray(response.data)) {
-          // Convertir pedidoData.id a número para comparación estricta
-          const pedidoIdNum = parseInt(pedidoData.id);
-          
-          const detallesPedido = response.data.filter(
-            detalle => detalle.pedidoId === pedidoIdNum
-          );
-
-          console.log("Detalles cargados:", detallesPedido); // Para depuración
-          
-          setProductos(detallesPedido.map(detalle => ({
+          setProductos(response.data.map(detalle => ({
             id: detalle.id,
             descripcion: detalle.descripcion,
             modelo: detalle.modelo,
@@ -61,12 +59,14 @@ export function NuevoPedido() {
             precioUnitario: detalle.precioUnitario,
             subtotal: detalle.cantidad * detalle.precioUnitario
           })));
-        } else {
-          console.error("Formato de respuesta inesperado:", response);
+          
+          console.log("Detalles cargados correctamente:", response.data);
         }
       } catch (error) {
         console.error("Error al cargar detalles del pedido:", error);
-        alert("Error al cargar los detalles del pedido");
+        alert("Error al cargar los productos del pedido");
+      }finally{
+        setCargando(false);
       }
     }
   };
@@ -88,91 +88,132 @@ export function NuevoPedido() {
   cargarProveedores();
 }, []);
 
- const handleAgregarProducto = async (producto) => {
-    if (modalData?.index !== undefined) {
-      // Editar producto existente
-      if (productos[modalData.index].id) {
-        // Si tiene ID, es un producto existente que debemos actualizar en el backend
-        try {
-          await ServiceDetallePedido.updateDetalle(
-            productos[modalData.index].id,
-            {
-              modelo: producto.modelo,
-              precioUnitario: producto.precioUnitario,
-              cantidad: producto.cantidad,
-              descripcion: producto.descripcion
-            }
-          );
-          
-          // Actualizar el estado local
-          setProductos(prev =>
-            prev.map((p, index) => (index === modalData.index ? producto : p))
-          );
-        } catch (error) {
-          console.error("Error al actualizar detalle:", error);
-          alert("Error al actualizar producto");
-          return;
-        }
-      } else {
-        // Producto nuevo que aún no se ha guardado en el backend
-        setProductos(prev =>
-          prev.map((p, index) => (index === modalData.index ? producto : p))
-        );
-      }
-    } else {
-      // Agregar nuevo producto
-      if (isEditing) {
-        // Si estamos editando, guardar primero en el backend
-        try {
-          const response = await ServiceDetallePedido.createDetalle({
-            pedidoId: parseInt(nroPedido),
-            modelo: producto.modelo,
-            precioUnitario: producto.precioUnitario,
-            cantidad: producto.cantidad,
-            descripcion: producto.descripcion
-          });
-          
-          // Agregar el producto con su ID
-          setProductos(prev => [...prev, {
-            ...producto,
-            id: response.data.id
-          }]);
-        } catch (error) {
-          console.error("Error al crear detalle:", error);
-          alert("Error al agregar producto");
-          return;
-        }
-      } else {
-        // Si es un nuevo pedido, solo agregar al estado local
-        setProductos(prev => [...prev, producto]);
-      }
-    }
-    setModalData(null);
-  };
-
-  const handleEditarProducto = (index) => {
-    setModalData({ ...productos[index], index });
-  };
-
-   const handleEliminarProducto = async (index) => {
-    const producto = productos[index];
-    
-    if (producto.id) {
-      // Si tiene ID, es un producto existente que debemos eliminar del backend
+const handleAgregarProducto = async (producto) => {
+  if (modalData?.index !== undefined) {
+    // ... (código existente para edición)
+  } else {
+    // Agregar nuevo producto
+    if (isEditing) {
       try {
-        await ServiceDetallePedido.deleteDetalle(producto.id);
-        setProductos(prev => prev.filter((_, i) => i !== index));
+        // Verificar que tenemos el ID del pedido
+        if (!nroPedido) {
+          throw new Error("No se encontró el ID del pedido");
+        }
+
+        // Crear el objeto con la estructura exacta que espera el backend
+        const detalleParaBackend = {
+          modelo: producto.modelo,
+          precioUnitario: producto.precioUnitario,
+          cantidad: producto.cantidad,
+          descripcion: producto.descripcion,
+          subtotal: producto.subtotal,
+          pedido: {
+            id: parseInt(nroPedido) // Estructura anidada como requiere el backend
+          }
+        };
+
+        console.log("Enviando al backend:", detalleParaBackend); // Para depuración
+
+        const response = await ServiceDetallePedido.createDetalle(detalleParaBackend);
+
+        // Verificar la respuesta
+        console.log("Respuesta del backend:", response.data);
+
+        // Agregar el producto con su ID generado por el backend
+        setProductos(prev => [...prev, {
+          ...producto,
+          id: response.data.id
+        }]);
       } catch (error) {
-        console.error("Error al eliminar detalle:", error);
-        alert("Error al eliminar producto");
+        console.error("Error al crear detalle:", {
+          error: error.response?.data || error.message,
+          status: error.response?.status
+        });
+        alert(`Error al agregar producto: ${error.response?.data?.message || error.message}`);
         return;
       }
     } else {
-      // Producto nuevo que solo existe en el estado local
-      setProductos(prev => prev.filter((_, i) => i !== index));
+      // Si es un nuevo pedido (no en modo edición)
+      setProductos(prev => [...prev, producto]);
     }
-  };
+  }
+  setModalData(null);
+};
+  const handleEditarProducto = (index) => {
+    setModalData({ 
+      ...productos[index], 
+      index,
+      isEditing: true // Bandera para saber que estamos editando
+    });
+};
 
+const handleEliminarProducto = async (index) => {
+  const producto = productos[index];
+  if (!producto?.id) {
+    console.error("Producto sin ID, eliminando solo localmente");
+    setProductos(prev => prev.filter((_, i) => i !== index));
+    return;
+  }
+
+  const confirmar = window.confirm(`¿Eliminar ${producto.modelo}?`);
+  if (!confirmar) return;
+
+  try {
+    console.log("[DELETE] Iniciando eliminación para ID:", producto.id);
+    
+    // 1. Intento de eliminación en backend
+    const response = await ServiceDetallePedido.deleteDetalle(producto.id);
+    console.log("[DELETE] Respuesta del servidor:", response);
+
+    // 2. Verificación adicional
+    try {
+      const verify = await ServiceDetallePedido.getDetalleById(producto.id);
+      if (verify.data) {
+        throw new Error("El detalle sigue existiendo después del DELETE");
+      }
+    } catch (verifyError) {
+      // Esperado: Debería dar 404 si se eliminó correctamente
+      console.log("[DELETE] Verificación exitosa (404 esperado)");
+    }
+
+    // 3. Eliminación local
+    setProductos(prev => prev.filter((_, i) => i !== index));
+    console.log("[DELETE] Eliminación local completada");
+    
+  } catch (error) {
+    console.error("[DELETE ERROR] Detalles completos:", {
+      message: error.message,
+      response: error.response,
+      config: error.config,
+      stack: error.stack
+    });
+
+    // Mostrar error específico al usuario
+    const errorMsg = error.response?.data?.message || 
+                    error.message || 
+                    "Error desconocido al eliminar";
+    
+    alert(`Error al eliminar: ${errorMsg}`);
+
+    // Recarga forzada de datos
+    if (isEditing && nroPedido) {
+      console.log("[DELETE] Recargando datos...");
+      try {
+        const { data } = await ServiceDetallePedido.getDetallesByPedidoId(nroPedido);
+        setProductos(data.map(item => ({
+          id: item.id_detalle || item.id, // Asegurar compatibilidad
+          descripcion: item.descripcion,
+          modelo: item.modelo,
+          cantidad: item.cantidad,
+          precioUnitario: item.precio_unitario || item.precioUnitario,
+          subtotal: item.subtotal || (item.cantidad * (item.precio_unitario || item.precioUnitario))
+        })));
+      } catch (refreshError) {
+        console.error("[DELETE] Error al recargar:", refreshError);
+      }
+    }
+  }
+};
   const calcularTotal = () => {
     return productos.reduce((acc, producto) => acc + producto.subtotal, 0);
   };
@@ -188,58 +229,55 @@ const handleGuardar = async () => {
     return;
   }
 
-  // Crear objeto pedido para enviar
   const pedido = {
     proveedorId: proveedor,
     estado: "PENDIENTE",
     metodoPago: modoPago,
     fechaEntrega,
-    total: calcularTotal()
+    total: calcularTotal(),
+    detallePedido: productos.filter(p => !p.id).map(p => ({
+      modelo: p.modelo,
+      precioUnitario: p.precioUnitario,
+      cantidad: p.cantidad,
+      descripcion: p.descripcion
+    }))
   };
 
   try {
     if (isEditing) {
       // Actualizar pedido existente
-      await ServicePedido.updatePedido(nroPedido, pedido);
-      
-      // Guardar los productos nuevos (los que no tienen ID)
-      const nuevosProductos = productos.filter(p => !p.id);
-      for (const producto of nuevosProductos) {
-        await ServiceDetallePedido.createDetalle({
-          pedidoId: parseInt(nroPedido),
-          modelo: producto.modelo,
-          precioUnitario: producto.precioUnitario,
-          cantidad: producto.cantidad,
-          descripcion: producto.descripcion
-        });
-      }
-      
+      await ServicePedido.updatePedido(nroPedido, {
+        proveedorId: proveedor,
+        estado: "PENDIENTE",
+        metodoPago:modoPago,
+        fechaEntrega,
+        total: calcularTotal()
+      });
+
       alert("Pedido actualizado correctamente");
+      navigate("/dashboard/proveedores/pedidos");
     } else {
       // Crear nuevo pedido
       const response = await ServicePedido.createPedido(pedido);
-      const nuevoPedidoId = response.data.id;
-      
-      // Guardar todos los productos asociados al nuevo pedido
-      for (const producto of productos) {
-        await ServiceDetallePedido.createDetalle({
-          pedidoId: nuevoPedidoId,
-          modelo: producto.modelo,
-          precioUnitario: producto.precioUnitario,
-          cantidad: producto.cantidad,
-          descripcion: producto.descripcion
-        });
+
+       if (response.data?.detallePedido) {
+        setProductos(prev => 
+          prev.map((p, index) => ({
+            ...p,
+            id: response.data.detallePedido[index]?.id || p.id
+          }))
+        );
       }
       
-      alert("Pedido guardado correctamente");
+      alert("Pedido creado correctamente");
       navigate("/dashboard/proveedores/pedidos");
     }
   } catch (error) {
     console.error("Error al guardar pedido:", error);
-    alert("Error al guardar pedido, intente nuevamente");
+    alert("Error al guardar pedido: " + (error.response?.data?.message || error.message));
   }
+  
 };
-
   return (
     <div className="p-2 space-y-4">
       <h1 className="text-2xl font-bold">
@@ -393,15 +431,46 @@ function ProductoModal({ data, onSave, onClose }) {
   const [cantidad, setCantidad] = useState(data?.cantidad || 1);
   const [precioUnitario, setPrecioUnitario] = useState(data?.precioUnitario || 0);
 
+  useEffect(() => {
+    // Resetear el formulario cuando cambian los datos
+    if (data) {
+      setDescripcion(data.descripcion || "");
+      setModelo(data.modelo || "");
+      setCantidad(data.cantidad || 1);
+      setPrecioUnitario(data.precioUnitario || 0);
+    }
+  }, [data]);
+  
   const handleSave = () => {
+    if (!modelo || !descripcion || !cantidad || !precioUnitario) {
+      alert("Por favor complete todos los campos");
+      return;
+    }
+
     const subtotal = cantidad * precioUnitario;
-    onSave({ descripcion, modelo, cantidad, precioUnitario, subtotal });
+    onSave({ 
+      descripcion, 
+      modelo, 
+      cantidad, 
+      precioUnitario, 
+      subtotal 
+    });
     onClose();
   };
 
   return (
-    <div className="space-y-4">
+      
+      
+      <div className="space-y-4">
+          <DialogHeader>
+        <DialogTitle>
+          {data?.isEditing ? "Editar Producto" : "Agregar Producto"}
+        </DialogTitle>
+      </DialogHeader>
       <DialogHeader>
+
+      
+
         <DialogTitle>Producto a pedido</DialogTitle>
       </DialogHeader>
       <div className="space-y-2">

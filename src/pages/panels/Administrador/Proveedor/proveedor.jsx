@@ -1,3 +1,4 @@
+//src\pages\panels\Administrador\Proveedor\proveedor.jsx
 import { useState, useEffect } from 'react';
 import { TableDemoProveedor } from './componentes/TableDemoProveedor';
 import { SheetDemoProveedor } from './componentes/SheetDemoProveedor';

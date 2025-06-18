@@ -1,3 +1,4 @@
+//src\pages\panels\Administrador\Ventas\componentes\VentasTable\Ventastabla.jsx
 import React from "react";
 import {
   flexRender,

@@ -1,3 +1,4 @@
+//src\routes\dashboardlayout.jsx
 import React from 'react';
 import Navbar from '@/navbar/nabvar';
 import AppSidebar from '@/components/app-sidebar';

@@ -1,3 +1,4 @@
+//src\routes\AdminRoutes.jsx
 import React from 'react'
 import GeneralError from '@/pages/general/errors/general-error'
 import PrivateRoute from './../utils/PrivateRoutes'

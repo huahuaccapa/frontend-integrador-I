@@ -1,3 +1,4 @@
+//src\pages\panels\Administrador\Inventario\componentes\Modales\EditarModal.jsx
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";

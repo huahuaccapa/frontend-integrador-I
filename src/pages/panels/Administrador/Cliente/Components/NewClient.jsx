@@ -1,3 +1,4 @@
+//src\pages\panels\Administrador\Cliente\Components\NewClient.jsx
 import { Button } from "@/components/ui/button";
 import {
   Sheet,

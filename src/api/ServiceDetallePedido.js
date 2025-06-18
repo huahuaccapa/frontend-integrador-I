@@ -1,32 +1,36 @@
-import axios from "axios";
+    import axios from "axios";
 
-const DETALLE_PEDIDO_BASE_REST_API_URL = "http://localhost:8080/api/v1/detalles-pedidos";
+    const DETALLE_PEDIDO_BASE_REST_API_URL = "http://localhost:8080/api/v1/detalles-pedidos";
 
-class ServiceDetallePedido {
-    // Obtener todos los detalles
-    getAllDetalles() {
-        return axios.get(DETALLE_PEDIDO_BASE_REST_API_URL);
-    }
+    class ServiceDetallePedido {
+        // Obtener todos los detalles
+        getAllDetalles() {
+            return axios.get(DETALLE_PEDIDO_BASE_REST_API_URL);
+        }
 
-    // Obtener detalle por ID
-    getDetalleById(id) {
-        return axios.get(`${DETALLE_PEDIDO_BASE_REST_API_URL}/${id}`);
-    }
+        // Obtener detalle por ID
+        getDetalleById(id) {
+            return axios.get(`${DETALLE_PEDIDO_BASE_REST_API_URL}/${id}`);
+        }
 
-    // Crear nuevo detalle
-    createDetalle(detalle) {
-        return axios.post(DETALLE_PEDIDO_BASE_REST_API_URL, detalle);
-    }
+        // Crear nuevo detalle
+        createDetalle(detalle) {
+            return axios.post(DETALLE_PEDIDO_BASE_REST_API_URL, detalle);
+        }
 
-    // Actualizar detalle
-    updateDetalle(id, detalle) {
-        return axios.put(`${DETALLE_PEDIDO_BASE_REST_API_URL}/${id}`, detalle);
-    }
+        // Actualizar detalle
+        updateDetalle(id, detalle) {
+            return axios.put(`${DETALLE_PEDIDO_BASE_REST_API_URL}/${id}`, detalle);
+        }
 
-    // Eliminar detalle
-    deleteDetalle(id) {
-        return axios.delete(`${DETALLE_PEDIDO_BASE_REST_API_URL}/${id}`);
-    }
+        // Eliminar detalle
+      deleteDetalle(id) {
+    return axios.delete(`${DETALLE_PEDIDO_BASE_REST_API_URL}/${id}`, );
 }
 
-export default new ServiceDetallePedido();
+        getDetallesByPedidoId(pedidoId) {
+        return axios.get(`${DETALLE_PEDIDO_BASE_REST_API_URL}/pedido/${pedidoId}`);
+    }
+    }
+
+    export default new ServiceDetallePedido();

@@ -39,6 +39,13 @@ class ServicePedido {
     getPedidosPorEstado(estado) {
         return axios.get(`${PEDIDO_BASE_REST_API_URL}/estado/${estado}`);
     }
+
+    // 8. Actualizar estado de un pedido
+    updateEstadoPedido(pedidoId, nuevoEstado) {
+        return axios.put(`${PEDIDO_BASE_REST_API_URL}/${pedidoId}/estado`, {
+            estado: nuevoEstado
+        });
+    }
 }
 
 export default new ServicePedido();

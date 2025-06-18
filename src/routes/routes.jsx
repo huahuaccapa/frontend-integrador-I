@@ -1,3 +1,4 @@
+//src\routes\routes.jsx
 import React from 'react';
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import GeneralError from './../pages/general/errors/general-error';

@@ -1,3 +1,4 @@
+//src\pages\panels\Administrador\Cliente\Components\ClienteTable\ClienteTable.jsx
 import React from "react";
 import { Button } from "@/components/ui/button";
 import {Table,TableBody,TableCaption,TableCell,TableHead,TableHeader,TableRow} from "@/components/ui/table";

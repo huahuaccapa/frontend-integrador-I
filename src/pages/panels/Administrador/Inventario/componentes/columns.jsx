@@ -1,3 +1,4 @@
+//src\pages\panels\Administrador\Inventario\componentes\columns.jsx
 import { Button } from "@/components/ui/button";
 import { Eye, Pencil, Trash, AlertTriangle } from "lucide-react";
 import {
@@ -19,19 +20,19 @@ export function getColumns(onVer, onEditar, onEliminar) {
       header: "Nombre",
     },
     {
-      accessorKey: "tipoProducto",
+      accessorKey: "categoria",
       header: "Tipo",
       cell: ({ row }) => (
         <Badge variant="outline" className="capitalize">
-          {row.getValue("tipoProducto")?.toLowerCase() || 'N/A'}
+          {row.getValue("categoria")?.toLowerCase() || 'N/A'}
         </Badge>
       ),
     },
     {
-      accessorKey: "estadoStock",
+      accessorKey: "estado",
       header: "Estado",
       cell: ({ row }) => {
-        const estado = row.getValue("estadoStock");
+        const estado = row.getValue("estado");
         let variant;
         switch(estado) {
           case 'OPTIMO': variant = 'default'; break;
@@ -75,10 +76,10 @@ export function getColumns(onVer, onEditar, onEliminar) {
       },
     },
     {
-      accessorKey: "precio",
+      accessorKey: "precioVenta",
       header: () => <div className="text-right">Precio</div>,
       cell: ({ row }) => {
-        const amount = parseFloat(row.getValue("precio"));
+        const amount = parseFloat(row.getValue("precioVenta"));
         const formatted = new Intl.NumberFormat("es-PE", {
           style: "currency",
           currency: "PEN",
