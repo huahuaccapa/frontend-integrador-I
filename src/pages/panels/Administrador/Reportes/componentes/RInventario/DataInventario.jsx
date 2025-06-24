@@ -98,7 +98,6 @@ export function RITable() {
   const [columnFilters, setColumnFilters] = useState([]);
   const [columnVisibility, setColumnVisibility] = useState({});
   const [rowSelection, setRowSelection] = useState({});
-  const [filtroGlobal, setFiltroGlobal] = useState("");
 
 
   // Filtrar las ventas según el rango de fechas seleccionado

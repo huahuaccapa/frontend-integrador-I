@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Eye, Pencil, Trash, AlertTriangle } from "lucide-react";
+import { Eye } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -10,6 +10,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Button } from "@/components/custom/button";
+import { useNavigate } from "react-router-dom";
+import * as XLSX from "xlsx";
 
 // Datos
 const data = [
@@ -26,35 +28,36 @@ export const columns = [
   { accessorKey: "Fecha", header: "Fecha de última Compra" },
   { accessorKey: "Compras", header: "Cant. de Compras" },
     {
-      id: "Historial",
-      enableHiding: false,
-      header: () => <div className="text-center">Historial</div>,
-      cell: ({ row }) => {
-        const producto = row.original;
+    id: "Historial",
+    enableHiding: false,
+    header: () => <div className="text-center">Historial</div>,
+    cell: ({ row }) => {
+        const cliente = row.original; // cliente seleccionado
+        const navigate = useNavigate(); // Mueve esto dentro si da error arriba
 
         return (
-          <div className="flex justify-center gap-2">
+        <div className="flex justify-center gap-2">
             <TooltipProvider>
-              <Tooltip>
+            <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button
+                <Button
                     size="icon"
                     variant="ghost"
                     className="hover:bg-blue-50 hover:text-blue-600"
-                    onClick={() => onVer(producto)}
-                  >
+                    onClick={() => navigate("/dashboard/Reportes/HistorialCliente", { state: { cliente } })}
+                >
                     <Eye className="h-4 w-4" />
-                  </Button>
+                </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Ver Historial</p>
+                <p>Ver Historial</p>
                 </TooltipContent>
-              </Tooltip>
+            </Tooltip>
             </TooltipProvider>
-          </div>
+        </div>
         );
-      },
     },
+    }
 ];
 
 export function RCTable() {
@@ -62,6 +65,7 @@ export function RCTable() {
   const [columnFilters, setColumnFilters] = useState([]);
   const [columnVisibility, setColumnVisibility] = useState({});
   const [rowSelection, setRowSelection] = useState([]);
+    const navigate = useNavigate();
 
   // Calcular cantidad de clientes únicos por RUC
   const cantidadClientes = new Set(data.map(cliente => cliente.RUC)).size;
@@ -85,6 +89,41 @@ export function RCTable() {
     },
   });
 
+  // Para exportar en XLSX
+  const exportToXLSX = () => {
+    const rows = table.getRowModel().rows;
+  
+    if (rows.length === 0) {
+      alert("No hay datos para exportar.");
+      return;
+    }
+  
+    const headers = {
+      RUC: "RUC",
+      Cliente: "Cliente",
+      Metodo: "Método de Pago",
+      Fecha: "Fecha de ultima Compra",
+      Compras: "Cantidad de Compras",
+    };
+  
+    const dataExport = rows.map((row) => {
+      const rowData = row.original;
+      return {
+        [headers.RUC]: rowData.RUC,
+        [headers.Cliente]: rowData.Cliente,
+        [headers.Metodo]: rowData.Metodo,
+        [headers.Fecha]: rowData.Fecha,
+        [headers.Compras]: rowData.Compras,
+      };
+    });
+  
+    const worksheet = XLSX.utils.json_to_sheet(dataExport);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Reporte_Clientes");
+    XLSX.writeFile(workbook, "RClientes.xlsx");
+  };
+  
+
   return (
     <div className="w-full">
       {/* Totales */}
@@ -93,6 +132,8 @@ export function RCTable() {
           <h1 className="text-black font-bold">Número de Clientes Registrados</h1>
           <p>{cantidadClientes}</p>
         </div>
+        <div> <Button className="bg-white text-black font-bold border-4 border-green-500 hover:bg-green-100"
+            onClick={exportToXLSX}>Exportar XLSX</Button></div>
       </div>
 
       {/* Filtro por cliente */}
@@ -144,6 +185,7 @@ export function RCTable() {
           </TableBody>
         </Table>
       </div>
+
     </div>
   );
 }
