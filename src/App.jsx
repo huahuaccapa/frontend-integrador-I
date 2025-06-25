@@ -15,6 +15,7 @@ import CreateUser from './pages/general/login/components/CreateUser';
 import ForgotPassword from './pages/general/login/components/ForgotPassword';
 import Profile from './pages/general/login/components/Profile';
 import { HistorialCliente } from './pages/panels/Administrador/Reportes/componentes/RCliente/Historial';
+import { ReporteStock } from './pages/panels/Administrador/Reportes/componentes/RInventario/ReporteStock';
 
 
 function App() {
@@ -37,6 +38,7 @@ function App() {
             <Route path="proveedores/pedidos" element={<Pedido />} />
             <Route path="proveedores/pedidos/nuevo" element={<NuevoPedido />} />
             <Route path="reportes/historialcliente" element={<HistorialCliente/>}/>
+            <Route path="reportes/reporteStock" element={<ReporteStock/>}/>
           </Route>
 
           {/* Rutas de nivel superior */}

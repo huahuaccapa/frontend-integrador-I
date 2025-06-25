@@ -65,7 +65,7 @@ export function RCTable() {
   const [columnFilters, setColumnFilters] = useState([]);
   const [columnVisibility, setColumnVisibility] = useState({});
   const [rowSelection, setRowSelection] = useState([]);
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
   // Calcular cantidad de clientes únicos por RUC
   const cantidadClientes = new Set(data.map(cliente => cliente.RUC)).size;
