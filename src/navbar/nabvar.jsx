@@ -15,8 +15,9 @@ const navigation = [
   { name: 'Clientes', href: '/dashboard/clientes' },
   { name: 'Inventario', href: '/dashboard/inventario' },
   { name: 'Proveedores', href: '/dashboard/proveedores' },
-  { name: 'Reportes', href: '/reportes' },
+  { name: 'Reportes', href: '/dashboard/reportes' },
   { name: 'Ventas', href: '/dashboard/ventas' },
+
 ];
 
 function classNames(...classes) {
@@ -57,8 +58,8 @@ export default function Navbar() {
               <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
                 <div className="flex shrink-0 items-center">
                   <img
-                    className="h-8 w-auto"
-                    src="https://images.vexels.com/media/users/3/142810/isolated/preview/ba0c22cef0e0d4a277d7433356482d9-escudo-emblema-logo.png" 
+                    className="h-8 w-8 rounded-full"
+                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREayWE3odb7eT-UL3xhc96tM-7kob4BYrxvA&s" 
                     alt="Company Logo"
                   />
                 </div>

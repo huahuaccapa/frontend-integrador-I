@@ -1,6 +1,12 @@
-import { Home, Proportions, User, Store, ShoppingBag, Handshake } from 'lucide-react';
+import { Home, Proportions, User, Store, ShoppingBag, Handshake,ChevronLeft, ChevronRight} from 'lucide-react';
 import React from 'react';
 import { NavLink } from "react-router-dom";
+import {
+  Sidebar,
+  SidebarHeader,
+  SidebarContent,
+} from "@/components/ui/sidebar";
+import { Button } from './ui/button';
 
 export default function AppSidebar() {
   return (
@@ -12,8 +18,8 @@ export default function AppSidebar() {
           <div className="flex shrink-0 items-center">
             <img
               alt="Your Company"
-              src="https://images.vexels.com/media/users/3/142810/isolated/preview/ba0c22cef0e0d4a277d74333536482d9-escudo-emblema-logo.png"
-              className="h-30 w-auto"
+              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREayWE3odb7eT-UL3xhc96tM-7kob4BYrxvA&s"
+              className="h-30 w-30 rounded-full"
             />
           </div>
         </div>
@@ -22,22 +28,12 @@ export default function AppSidebar() {
         <nav className="space-y-4 alig-center">
           <SidebarItem icon={Home} title="Home" to="/dashboard" />
           <SidebarItem icon={User} title="Clientes" to="clientes" /> {/* Cambiado a ruta relativa */}
-          <SidebarItem icon={Proportions} title="Reportes" />
+          <SidebarItem icon={Proportions} title="Reportes" to="reportes"/>
           <SidebarItem icon={ShoppingBag} title="Inventario" to="inventario" />
           <SidebarItem icon={Handshake} title="Proveedores" to="proveedores"/>
           <SidebarItem icon={Store} title="Ventas" to="ventas" />
           
         </nav>
-      </div>
-
-      {/* Usuario */}
-      <div className="flex items-center gap-3 mt-6">
-        <img
-          src="https://t4.ftcdn.net/jpg/03/83/25/83/360_F_383258331_D8imaEMl8Q3lf7EKU2Pi78Cn0R7KkW9o.jpg"
-          alt="Tom Cook"
-          className="w-10 h-10 rounded-full"
-        />
-        <span className="text-sm font-medium">Tom Cook</span>
       </div>
     </div>
   );
@@ -63,3 +59,4 @@ function SidebarItem({ icon: Icon, title, badge, to }) {
     </NavLink>
   );
 }
+
