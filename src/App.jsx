@@ -9,13 +9,10 @@ import {NuevoPedido} from './pages/panels/Administrador/Proveedor/componentes/Fo
 import {Producto} from './pages/panels/Administrador/Inventario/componentes/NuevoProducto'
 import {Ventas} from './pages/panels/Administrador/Ventas/ventas' 
 import { ProcesoVenta } from './pages/panels/Administrador/Ventas/componentes/ProcesoVenta';
-<<<<<<< HEAD
 // REMOVIDO: Sin Toaster global
 
-=======
 import { Toaster } from "@/components/ui/sonner";
 import { Reportes } from './pages/panels/Administrador/Reportes/Reportes';
->>>>>>> master
 import CreateUser from './pages/general/login/components/CreateUser';
 import ForgotPassword from './pages/general/login/components/ForgotPassword';
 import Profile from './pages/general/login/components/Profile';
