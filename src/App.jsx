@@ -9,8 +9,6 @@ import {NuevoPedido} from './pages/panels/Administrador/Proveedor/componentes/Fo
 import {Producto} from './pages/panels/Administrador/Inventario/componentes/NuevoProducto'
 import {Ventas} from './pages/panels/Administrador/Ventas/ventas' 
 import { ProcesoVenta } from './pages/panels/Administrador/Ventas/componentes/ProcesoVenta';
-// REMOVIDO: Sin Toaster global
-
 import { Toaster } from "@/components/ui/sonner";
 import { Reportes } from './pages/panels/Administrador/Reportes/Reportes';
 import CreateUser from './pages/general/login/components/CreateUser';
@@ -18,6 +16,7 @@ import ForgotPassword from './pages/general/login/components/ForgotPassword';
 import Profile from './pages/general/login/components/Profile';
 import { HistorialCliente } from './pages/panels/Administrador/Reportes/componentes/RCliente/Historial';
 import { ReporteStock } from './pages/panels/Administrador/Reportes/componentes/RInventario/ReporteStock';
+
 
 function App() {
   return (
@@ -48,9 +47,10 @@ function App() {
           <Route path="/perfil" element={<Profile />} />
         </Routes>
       </Router>
-      {/* REMOVIDO: Sin Toaster global - cada componente maneja su propio Toaster */}
+      <Toaster />
     </div>
   );
 }
+
 
 export default App;

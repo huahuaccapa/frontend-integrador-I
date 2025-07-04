@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -12,28 +12,22 @@ import {
 import { Button } from "@/components/custom/button";
 import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx";
+import ServiceReporte from "@/api/ServiceReporte";
 
-// Datos
-const data = [
-  { Cliente: "Jorge Basadre", RUC: "10235465676565", Metodo: "YAPE", Fecha: "12/06/2025", Compras: 15 },
-  { Cliente: "Ana Pérez", RUC: "10235465676566", Metodo: "Transferencia", Fecha: "10/06/2025", Compras: 8 },
-  { Cliente: "Luis León", RUC: "10235465676567", Metodo: "Efectivo", Fecha: "08/06/2025", Compras: 12 },
-];
-
-// Columnas
+// Columnas (se mantienen igual)
 export const columns = [
-  { accessorKey: "RUC", header: "RUC" },
-  { accessorKey: "Cliente", header: "Cliente" },
-  { accessorKey: "Metodo", header: "Método de Pago" },
-  { accessorKey: "Fecha", header: "Fecha de última Compra" },
-  { accessorKey: "Compras", header: "Cant. de Compras" },
-    {
+  { accessorKey: "ruc", header: "RUC" },
+  { accessorKey: "nombre", header: "Cliente" },
+  { accessorKey: "metodoPago", header: "Método de Pago" },
+  { accessorKey: "fechaUltimaCompra", header: "Fecha de última Compra" },
+  { accessorKey: "cantidadCompras", header: "Cant. de Compras" },
+  {
     id: "Historial",
     enableHiding: false,
     header: () => <div className="text-center">Historial</div>,
     cell: ({ row }) => {
-        const cliente = row.original; // cliente seleccionado
-        const navigate = useNavigate(); // Mueve esto dentro si da error arriba
+        const cliente = row.original;
+        const navigate = useNavigate();
 
         return (
         <div className="flex justify-center gap-2">
@@ -57,7 +51,7 @@ export const columns = [
         </div>
         );
     },
-    }
+  }
 ];
 
 export function RCTable() {
@@ -65,10 +59,28 @@ export function RCTable() {
   const [columnFilters, setColumnFilters] = useState([]);
   const [columnVisibility, setColumnVisibility] = useState({});
   const [rowSelection, setRowSelection] = useState([]);
+  const [data, setData] = useState([]);
+  const [cantidadClientes, setCantidadClientes] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  // Calcular cantidad de clientes únicos por RUC
-  const cantidadClientes = new Set(data.map(cliente => cliente.RUC)).size;
+  // Obtener datos de la API
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await ServiceReporte.getReporteClientes();
+        setData(response.data.clientes);
+        setCantidadClientes(response.data.cantidadClientes);
+        setLoading(false);
+      } catch (error) {
+        setError(error.message);
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const table = useReactTable({
     data,
@@ -99,21 +111,21 @@ export function RCTable() {
     }
   
     const headers = {
-      RUC: "RUC",
-      Cliente: "Cliente",
-      Metodo: "Método de Pago",
-      Fecha: "Fecha de ultima Compra",
-      Compras: "Cantidad de Compras",
+      ruc: "RUC",
+      nombre: "Cliente",
+      metodoPago: "Método de Pago",
+      fechaUltimaCompra: "Fecha de ultima Compra",
+      cantidadCompras: "Cantidad de Compras",
     };
   
     const dataExport = rows.map((row) => {
       const rowData = row.original;
       return {
-        [headers.RUC]: rowData.RUC,
-        [headers.Cliente]: rowData.Cliente,
-        [headers.Metodo]: rowData.Metodo,
-        [headers.Fecha]: rowData.Fecha,
-        [headers.Compras]: rowData.Compras,
+        [headers.ruc]: rowData.ruc,
+        [headers.nombre]: rowData.nombre,
+        [headers.metodoPago]: rowData.metodoPago,
+        [headers.fechaUltimaCompra]: rowData.fechaUltimaCompra,
+        [headers.cantidadCompras]: rowData.cantidadCompras,
       };
     });
   
@@ -122,7 +134,14 @@ export function RCTable() {
     XLSX.utils.book_append_sheet(workbook, worksheet, "Reporte_Clientes");
     XLSX.writeFile(workbook, "RClientes.xlsx");
   };
-  
+
+  if (loading) {
+    return <div>Cargando datos...</div>;
+  }
+
+  if (error) {
+    return <div>Error al cargar los datos: {error}</div>;
+  }
 
   return (
     <div className="w-full">
@@ -132,17 +151,23 @@ export function RCTable() {
           <h1 className="text-black font-bold">Número de Clientes Registrados</h1>
           <p>{cantidadClientes}</p>
         </div>
-        <div> <Button className="bg-white text-black font-bold border-4 border-green-500 hover:bg-green-100"
-            onClick={exportToXLSX}>Exportar XLSX</Button></div>
+        <div> 
+          <Button 
+            className="bg-white text-black font-bold border-4 border-green-500 hover:bg-green-100"
+            onClick={exportToXLSX}
+          >
+            Exportar XLSX
+          </Button>
+        </div>
       </div>
 
       {/* Filtro por cliente */}
       <div className="flex flex-col md:flex-row items-start md:items-center gap-4 py-4">
         <Input
           placeholder="Filtrar por cliente..."
-          value={table.getColumn("Cliente")?.getFilterValue() ?? ""}
+          value={table.getColumn("nombre")?.getFilterValue() ?? ""}
           onChange={(event) =>
-            table.getColumn("Cliente")?.setFilterValue(event.target.value)
+            table.getColumn("nombre")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
@@ -185,7 +210,6 @@ export function RCTable() {
           </TableBody>
         </Table>
       </div>
-
     </div>
   );
 }

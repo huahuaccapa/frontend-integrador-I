@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import {flexRender,getCoreRowModel,getFilteredRowModel,getPaginationRowModel,getSortedRowModel,useReactTable,} from "@tanstack/react-table";
 import {  CalendarIcon } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -10,53 +9,9 @@ import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import * as XLSX from "xlsx";
 import { useNavigate } from "react-router-dom";
+import ServiceReporte from "@/api/ServiceReporte";
+import React, { useState, useEffect } from "react";
 
-// Datos de ejemplo
-const data = [
-  {
-    id: "P001",
-    Producto: "Pantalla",
-    P_Venta: 316,
-    Stock: 2,
-    Stock_min: 1,
-    Fecha: "12/06/2025",
-    Proveedor: "Italic SAC",
-    Categoria: "Accesesorio"
-  },
-  {
-    id: "P002",
-    Producto: "Pantalla 3",
-    P_Venta: 316,
-    Stock: 2,
-    Stock_min: 1,
-    Fecha: "12/06/2025",
-    Proveedor: "Italic SAC",
-    Categoria: "Repuesto"
-  },
-  {
-    id: "P003",
-    Producto: "Pantalla4",
-    P_Venta: 316,
-    Stock: 2,
-    Stock_min: 1,
-    Fecha: "12/06/2025",
-    Proveedor: "Italic SAC",
-    Categoria: "Repuesto"
-  },
-  {
-    id: "P004",
-    Producto: "Pantalla4",
-    P_Venta: 316,
-    Stock: 2,
-    Stock_min: 1,
-    Fecha: "14/06/2025",
-    Proveedor: "Italic3 SAC",
-    Categoria: "Accesesorio"
-  },
-  
-];
-
-// Columnas
 export const columns = [
   {
     accessorKey: "id",
@@ -99,25 +54,39 @@ export function RITable() {
   const [columnFilters, setColumnFilters] = useState([]);
   const [columnVisibility, setColumnVisibility] = useState({});
   const [rowSelection, setRowSelection] = useState({});
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [totalInventario, setTotalInventario] = useState(0);
+  const [cantidadInventario, setCantidadInventario] = useState(0);
   const navigate = useNavigate();
 
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const response = await ServiceReporte.getReporteInventario(startDate, endDate);
+      
+      // Asumiendo que tu backend devuelve un objeto con esta estructura
+      setData(response.data.inventario || []);
+      setTotalInventario(response.data.totalInventario || 0);
+      setCantidadInventario(response.data.cantidadProductos || 0);
+      
+      setError(null);
+    } catch (err) {
+      setError("Error al cargar los datos del inventario");
+      console.error("Error fetching inventory data:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  // Filtrar las ventas según el rango de fechas seleccionado
-  const filteredData = React.useMemo(() => {
-    return data.filter((inv) => {
-      const invDate = new Date(inv.Fecha.split("/").reverse().join("-")); // "12/12/2025" => "2025-12-12"
-      const afterStart = startDate ? invDate >= startDate : true;
-      const beforeEnd = endDate ? invDate <= endDate : true;
-      return afterStart && beforeEnd;
-    });
+    // Efecto para cargar datos cuando cambian las fechas
+  useEffect(() => {
+    fetchData();
   }, [startDate, endDate]);
 
-  // Calcular totales filtrados
-  const totalInventario = filteredData.reduce((acc, inv) => acc + inv.P_Venta, 0);
-  const cantidadInventario = filteredData.length;
-
   const table = useReactTable({
-    data: filteredData,
+    data,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -134,11 +103,19 @@ export function RITable() {
       rowSelection,
     },
   });
+
+    if (loading) {
+    return <div>Cargando datos del inventario...</div>;
+  }
+
+  if (error) {
+    return <div className="text-red-500">{error}</div>;
+  }
+
+
 // Para exportar en XLSX
 const exportToXLSX = () => {
-  const rows = table.getRowModel().rows;
-
-  if (rows.length === 0) {
+  if (data.length === 0) {
     alert("No hay datos para exportar.");
     return;
   }
@@ -146,28 +123,28 @@ const exportToXLSX = () => {
   const headers = {
     id: "ID",
     Producto: "Producto",
-    P_Venta: "P. Venta",
+    P_Venta: "P. Venta (S/.)",
     Stock: "Stock Disponible",
     Categoria: "Categoría",
     Proveedor: "Proveedor"
   };
 
-  const dataExport = rows.map((row) => {
-    const rowData = row.original;
-    return {
-      [headers.id]: rowData.id,
-      [headers.Producto]: rowData.Producto,
-      [headers.P_Venta]: rowData.P_Venta,
-      [headers.Stock]: rowData.Stock,
-      [headers.Categoria]: rowData.Categoria,
-      [headers.Proveedor]: rowData.Proveedor,
-    };
-  });
+  const dataExport = data.map((item) => ({
+    [headers.id]: item.id,
+    [headers.Producto]: item.Producto,
+    [headers.P_Venta]: item.P_Venta,
+    [headers.Stock]: item.Stock,
+    [headers.Categoria]: item.Categoria,
+    [headers.Proveedor]: item.Proveedor,
+  }));
 
   const worksheet = XLSX.utils.json_to_sheet(dataExport);
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, "Inventario");
-  XLSX.writeFile(workbook, "inventario.xlsx");
+  
+  // Nombre del archivo con fecha
+  const fecha = new Date().toISOString().split('T')[0];
+  XLSX.writeFile(workbook, `Inventario_${fecha}.xlsx`);
 };
 
 
