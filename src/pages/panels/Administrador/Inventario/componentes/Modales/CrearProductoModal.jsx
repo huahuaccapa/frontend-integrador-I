@@ -103,7 +103,7 @@ export function CrearProductoModal({ open, onOpenChange, onGuardar }) {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/v1/productos",
+        "https://multiservicios-85dff762daa1.herokuapp.com/api/v1/productos",
         {
           ...producto,
           imagenes: images,

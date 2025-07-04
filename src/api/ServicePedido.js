@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // URL base del controlador de pedidos
-const PEDIDO_BASE_REST_API_URL = "http://localhost:8080/api/v1/pedidos";
+const PEDIDO_BASE_REST_API_URL = "https://multiservicios-85dff762daa1.herokuapp.com/api/v1/pedidos";
 
 class ServicePedido {
 
