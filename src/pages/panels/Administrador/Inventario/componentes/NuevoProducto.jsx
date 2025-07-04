@@ -18,6 +18,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { cn } from "@/lib/utils"
 import { Trash2, Upload, ImagePlus, CalendarIcon } from "lucide-react"
 import axios from "axios"
+import { useLocation, useNavigate } from "react-router-dom";
 
 const uploadImage = async (file) => {
   const formData = new FormData();
@@ -41,6 +42,7 @@ export function Producto() {
   const [images, setImages] = useState([])
   const [urlInput, setUrlInput] = useState("")
   const [isUploading, setIsUploading] = useState(false)
+  const navigate = useNavigate();
 
   const [producto, setProducto] = useState({
     nombreProducto: "",
@@ -266,7 +268,10 @@ export function Producto() {
               </SelectContent>
             </Select>
 
-            <Button onClick={handleGuardarProducto} className='bg-black text-white my-10'>Guardar</Button>
+            <Button onClick={() => {
+                handleGuardarProducto(); // primero guarda
+                navigate(-1);            // luego vuelve atrás
+              }} className='bg-black text-white my-10'>Guardar</Button>
           </div>
         </div>
 
@@ -347,6 +352,7 @@ export function Producto() {
             <Button variant="secondary" onClick={handleAddUrlImage}>Agregar</Button>
           </div>
         </div>
+        <Button onClick={() => navigate(-1)} className="my-4">Volver</Button>
       </div>
     </div>
   )
