@@ -48,6 +48,8 @@ export const columns = [
 
 export function ReporteStock() {
 
+  const navigate = useNavigate();
+
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -62,7 +64,7 @@ useEffect(() => {
     try {
       setLoading(true);
       const response = await Services.obtenerProductosConStockBajo();
-      
+   
       // Mapea los datos si es necesario
       const datosFormateados = response.data.map(item => ({
         id: item.id,
@@ -135,13 +137,13 @@ const exportToXLSX = () => {
       <div className="flex flex-col md:flex-row items-start md:items-center gap-5 py-4">
         
         <Input
-            placeholder="Filtrar por Producto..."
-            value={table.getColumn("Producto")?.getFilterValue() ?? ""}
-            onChange={(event) =>
-            table.getColumn("nombreProducto")?.setFilterValue(event.target.value)
-            }
-            className="w-1/2"
-        />
+  placeholder="Filtrar por Producto..."
+  value={table.getColumn("nombreProducto")?.getFilterValue() ?? ""}
+  onChange={(event) =>
+    table.getColumn("nombreProducto")?.setFilterValue(event.target.value)
+  }
+  className="w-1/2"
+/>
 
 
         <div>
