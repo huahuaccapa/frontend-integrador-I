@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   flexRender,
   getCoreRowModel,
@@ -7,7 +7,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import {  CalendarIcon } from "lucide-react";
+import { CalendarIcon, Printer } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,45 +22,7 @@ import {
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
-
-// Datos de ejemplo
-const data = [
-  {
-    id: "V001",
-    Cliente: "Cliente001",
-    Total: 316,
-    Metodo: "YAPE",
-    Fecha: "12/12/2025",
-  },
-  {
-    id: "V002",
-    Cliente: "Cliente002",
-    Total: 420,
-    Metodo: "EFECTIVO",
-    Fecha: "13/12/2025",
-  },
-  {
-    id: "V003",
-    Cliente: "Cliente003",
-    Total: 150,
-    Metodo: "TARJETA",
-    Fecha: "14/12/2025",
-  },
-  {
-    id: "V004",
-    Cliente: "Cliente004",
-    Total: 999,
-    Metodo: "YAPE",
-    Fecha: "15/12/2025",
-  },
-  {
-    id: "V004",
-    Cliente: "Cliente004",
-    Total: 109.50,
-    Metodo: "YAPE",
-    Fecha: "16/12/2025",
-  },
-];
+import ServiceVentas from "@/api/ServiceVentas";
 
 // Columnas
 export const columns = [
@@ -69,18 +31,18 @@ export const columns = [
     header: "ID",
   },
   {
-    accessorKey: "Cliente",
+    accessorKey: "cliente", // Ajustado para coincidir con el backend
     header: "Cliente",
   },
   {
-    accessorKey: "Metodo",
+    accessorKey: "metodoPago", // Ajustado para coincidir con el backend
     header: "Método de Pago",
   },
   {
-    accessorKey: "Total",
+    accessorKey: "total",
     header: () => <div className="text-right">Total</div>,
     cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("Total"));
+      const amount = parseFloat(row.getValue("total"));
       const formatted = new Intl.NumberFormat("es-PE", {
         style: "currency",
         currency: "PEN",
@@ -89,12 +51,18 @@ export const columns = [
     },
   },
   {
-    accessorKey: "Fecha",
+    accessorKey: "fecha", // Ajustado para coincidir con el backend
     header: "Fecha",
+    cell: ({ row }) => {
+      const fecha = row.getValue("fecha");
+      return format(new Date(fecha), "dd/MM/yyyy");
+    },
   },
 ];
 
 export function RVTable() {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [startDate, setStartDate] = useState();
   const [endDate, setEndDate] = useState();
   const [sorting, setSorting] = useState([]);
@@ -102,18 +70,34 @@ export function RVTable() {
   const [columnVisibility, setColumnVisibility] = useState({});
   const [rowSelection, setRowSelection] = useState({});
 
+  // Cargar datos del backend
+  useEffect(() => {
+    const fetchVentas = async () => {
+      try {
+        const response = await ServiceVentas.getAllVentas();
+        setData(response.data);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error al cargar las ventas:", error);
+        setLoading(false);
+      }
+    };
+
+    fetchVentas();
+  }, []);
+
   // Filtrar las ventas según el rango de fechas seleccionado
   const filteredData = React.useMemo(() => {
     return data.filter((venta) => {
-      const ventaDate = new Date(venta.Fecha.split("/").reverse().join("-")); // "12/12/2025" => "2025-12-12"
+      const ventaDate = new Date(venta.fecha);
       const afterStart = startDate ? ventaDate >= startDate : true;
       const beforeEnd = endDate ? ventaDate <= endDate : true;
       return afterStart && beforeEnd;
     });
-  }, [startDate, endDate]);
+  }, [data, startDate, endDate]);
 
   // Calcular totales filtrados
-  const totalVentas = filteredData.reduce((acc, venta) => acc + venta.Total, 0);
+  const totalVentas = filteredData.reduce((acc, venta) => acc + venta.total, 0);
   const cantidadVentas = filteredData.length;
 
   const table = useReactTable({
@@ -135,6 +119,79 @@ export function RVTable() {
     },
   });
 
+  // Función para imprimir la tabla
+  const handlePrint = () => {
+    const printWindow = window.open("", "_blank");
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Reporte de Ventas</title>
+          <style>
+            body { font-family: Arial, sans-serif; }
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+            th { background-color: #f2f2f2; }
+            .text-right { text-align: right; }
+            .header { margin-bottom: 20px; }
+            .totals { margin-bottom: 20px; display: flex; justify-content: space-between; }
+          </style>
+        </head>
+        <body>
+          <h1 class="header">Reporte de Ventas</h1>
+          <div class="totals">
+            <div>
+              <strong>Ingreso de ventas:</strong> S/. ${totalVentas.toLocaleString("es-PE", { minimumFractionDigits: 2 })}
+            </div>
+            <div>
+              <strong>Número de Ventas Totales:</strong> ${cantidadVentas}
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                ${table.getHeaderGroups()[0].headers.map(header => 
+                  `<th>${header.column.columnDef.header}</th>`
+                ).join("")}
+              </tr>
+            </thead>
+            <tbody>
+              ${table.getRowModel().rows.map(row => `
+                <tr>
+                  ${row.getVisibleCells().map(cell => `
+                    <td class="${cell.column.id === "total" ? "text-right" : ""}">
+                      ${cell.column.id === "total" ? 
+                        new Intl.NumberFormat("es-PE", {
+                          style: "currency",
+                          currency: "PEN",
+                        }).format(cell.getValue()) :
+                        (cell.column.id === "fecha" ? 
+                          format(new Date(cell.getValue()), "dd/MM/yyyy") : 
+                          cell.getValue())
+                      }
+                    </td>
+                  `).join("")}
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+          <script>
+            window.onload = function() {
+              setTimeout(function() {
+                window.print();
+                window.close();
+              }, 200);
+            };
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+  };
+
+  if (loading) {
+    return <div>Cargando ventas...</div>;
+  }
+
   return (
     <div className="w-full">
       {/* Encabezado con totales */}
@@ -149,13 +206,13 @@ export function RVTable() {
         </div>
       </div>
 
-      {/* Filtros */}
+      {/* Filtros y botón de impresión */}
       <div className="flex flex-col md:flex-row items-start md:items-center gap-4 py-4">
         <Input
           placeholder="Filtrar por cliente..."
-          value={table.getColumn("Cliente")?.getFilterValue() ?? ""}
+          value={table.getColumn("cliente")?.getFilterValue() ?? ""}
           onChange={(event) =>
-            table.getColumn("Cliente")?.setFilterValue(event.target.value)
+            table.getColumn("cliente")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
@@ -195,6 +252,12 @@ export function RVTable() {
               </PopoverContent>
             </Popover>
           </div>
+
+          {/* Botón de impresión */}
+          <Button onClick={handlePrint} className="ml-auto">
+            <Printer className="mr-2 h-4 w-4" />
+            Imprimir
+          </Button>
         </div>
       </div>
 
@@ -238,4 +301,3 @@ export function RVTable() {
     </div>
   );
 }
-

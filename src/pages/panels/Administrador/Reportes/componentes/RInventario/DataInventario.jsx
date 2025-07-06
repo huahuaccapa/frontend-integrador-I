@@ -11,6 +11,7 @@ import * as XLSX from "xlsx";
 import { useNavigate } from "react-router-dom";
 import ServiceReporte from "@/api/ServiceReporte";
 import React, { useState, useEffect } from "react";
+import Services from "@/api/Services";
 
 export const columns = [
   {
@@ -61,24 +62,39 @@ export function RITable() {
   const [cantidadInventario, setCantidadInventario] = useState(0);
   const navigate = useNavigate();
 
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      const response = await ServiceReporte.getReporteInventario(startDate, endDate);
-      
-      // Asumiendo que tu backend devuelve un objeto con esta estructura
-      setData(response.data.inventario || []);
-      setTotalInventario(response.data.totalInventario || 0);
-      setCantidadInventario(response.data.cantidadProductos || 0);
-      
-      setError(null);
-    } catch (err) {
-      setError("Error al cargar los datos del inventario");
-      console.error("Error fetching inventory data:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+const fetchData = async () => {
+  try {
+    setLoading(true);
+    const response = await Services.getAllProductos();
+
+    const productos = response.data;
+
+    // Calcula el total del inventario y cantidad de productos
+    const total = productos.reduce((acc, producto) => acc + parseFloat(producto.precioVenta || 0), 0);
+    const cantidad = productos.length;
+
+    // Mapea los datos al formato esperado por la tabla
+    const dataFormateada = productos.map(p => ({
+      id: p.id,
+      Producto: p.nombreProducto,
+      P_Venta: p.precioVenta,
+      Stock: p.stock,
+      Categoria: p.categoria,
+      Proveedor: p.proveedor?.nombre || "Sin proveedor"
+    }));
+
+    setData(dataFormateada);
+    setTotalInventario(total);
+    setCantidadInventario(cantidad);
+    setError(null);
+  } catch (err) {
+    setError("Error al cargar los productos");
+    console.error("Error:", err);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
     // Efecto para cargar datos cuando cambian las fechas
   useEffect(() => {
