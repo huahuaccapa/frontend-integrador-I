@@ -19,11 +19,11 @@ export const columns = [
     header: "ID",
   },
   {
-    accessorKey: "Producto",
+    accessorKey: "Producto", // Coincide con dataFormateada
     header: "Producto",
   },
   {
-    accessorKey: "P_Venta",
+    accessorKey: "P_Venta", // Coincide con dataFormateada
     header: () => <div className="text-right">P. Venta</div>,
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue("P_Venta"));
@@ -34,16 +34,16 @@ export const columns = [
       return <div className="text-right font-medium">{formatted}</div>;
     },
   },
-   {
-    accessorKey: "Stock",
+  {
+    accessorKey: "Stock", // Coincide con dataFormateada
     header: "Stock Disponible",
   },
   {
-    accessorKey: "Categoria",
+    accessorKey: "Categoria", // Coincide con dataFormateada
     header: "Categoria",
   },
   {
-    accessorKey: "Proveedor",
+    accessorKey: "Proveedor", // Coincide con dataFormateada
     header: "Proveedor",
   },
 ];
@@ -66,7 +66,6 @@ const fetchData = async () => {
   try {
     setLoading(true);
     const response = await Services.getAllProductos();
-
     const productos = response.data;
 
     // Calcula el total del inventario y cantidad de productos
@@ -80,10 +79,10 @@ const fetchData = async () => {
       P_Venta: p.precioVenta,
       Stock: p.stock,
       Categoria: p.categoria,
-      Proveedor: p.proveedor?.nombre || "Sin proveedor"
+      Proveedor: p.proveedor?.nombre || "Sin proveedor" // Asegúrate que tu API tenga este campo
     }));
 
-    setData(dataFormateada);
+    setData(dataFormateada); // Cambiado de response.data a dataFormateada
     setTotalInventario(total);
     setCantidadInventario(cantidad);
     setError(null);
@@ -94,7 +93,6 @@ const fetchData = async () => {
     setLoading(false);
   }
 };
-
 
     // Efecto para cargar datos cuando cambian las fechas
   useEffect(() => {

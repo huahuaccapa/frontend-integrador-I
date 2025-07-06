@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
+
 import {flexRender,getCoreRowModel,getFilteredRowModel,getPaginationRowModel,getSortedRowModel,useReactTable,} from "@tanstack/react-table";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
@@ -6,52 +7,8 @@ import { Input } from "@/components/ui/input";
 import {Table,TableBody,TableCell,TableHead,TableHeader,TableRow,} from "@/components/ui/table";
 import * as XLSX from "xlsx";
 import { useLocation, useNavigate } from "react-router-dom";
+import Services from "@/api/Services";
 
-
-// Datos de ejemplo
-const data = [
-  {
-    id: "P001",
-    Producto: "Pantalla",
-    P_Venta: 316,
-    Stock: 2,
-    Stock_min: 1,
-    Fecha: "12/06/2025",
-    Proveedor: "Italic SAC",
-    Categoria: "Accesesorio"
-  },
-  {
-    id: "P002",
-    Producto: "Pantalla 3",
-    P_Venta: 316,
-    Stock: 2,
-    Stock_min: 1,
-    Fecha: "12/06/2025",
-    Proveedor: "Italic SAC",
-    Categoria: "Repuesto"
-  },
-  {
-    id: "P003",
-    Producto: "Pantalla4",
-    P_Venta: 316,
-    Stock: 2,
-    Stock_min: 1,
-    Fecha: "12/06/2025",
-    Proveedor: "Italic SAC",
-    Categoria: "Repuesto"
-  },
-  {
-    id: "P004",
-    Producto: "Pantalla4",
-    P_Venta: 316,
-    Stock: 2,
-    Stock_min: 1,
-    Fecha: "14/06/2025",
-    Proveedor: "Italic3 SAC",
-    Categoria: "Accesesorio"
-  },
-  
-];
 
 // Columnas
 export const columns = [
@@ -60,14 +17,14 @@ export const columns = [
     header: "ID",
   },
   {
-    accessorKey: "Producto",
+    accessorKey: "nombreProducto",
     header: "Producto",
   },
   {
-    accessorKey: "P_Venta",
+    accessorKey: "precioVenta",
     header: () => <div className="text-right">P. Venta</div>,
     cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("P_Venta"));
+      const amount = parseFloat(row.getValue("precioVenta"));
       const formatted = new Intl.NumberFormat("es-PE", {
         style: "currency",
         currency: "PEN",
@@ -76,11 +33,11 @@ export const columns = [
     },
   },
    {
-    accessorKey: "Stock",
+    accessorKey: "stock",
     header: "Stock",
   },
   {
-    accessorKey: "Categoria",
+    accessorKey: "categoria",
     header: "Categoria",
   },
   {
@@ -91,13 +48,41 @@ export const columns = [
 
 export function ReporteStock() {
 
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
   const [columnVisibility, setColumnVisibility] = useState({});
   const [rowSelection, setRowSelection] = useState({});
-   const navigate = useNavigate();
 
-
+  // Obtener productos con stock bajo
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const response = await Services.obtenerProductosConStockBajo();
+      
+      // Mapea los datos si es necesario
+      const datosFormateados = response.data.map(item => ({
+        id: item.id,
+        nombreProducto: item.nombreProducto,
+        precioVenta: item.precioVenta,
+        stock: item.stock,
+        categoria: item.categoria
+      }));
+      
+      setData(datosFormateados);
+      setError(null);
+    } catch (error) {
+      console.error("Error al obtener productos con stock bajo:", error);
+      setError("Error al cargar los datos");
+    } finally {
+      setLoading(false);
+    }
+  };
+  fetchData();
+}, []);
  
   const table = useReactTable({
     data,
@@ -119,36 +104,24 @@ export function ReporteStock() {
   });
 // Para exportar en XLSX
 const exportToXLSX = () => {
-  const rows = table.getRowModel().rows;
-
-  if (rows.length === 0) {
+  if (data.length === 0) {
     alert("No hay datos para exportar.");
     return;
   }
 
-  const headers = {
-    id: "ID",
-    Producto: "Producto",
-    P_Venta: "P. Venta",
-    Stock: "Stock Disponible",
-    Proveedor: "Proveedor"
-  };
-
-  const dataExport = rows.map((row) => {
-    const rowData = row.original;
-    return {
-      [headers.id]: rowData.id,
-      [headers.Producto]: rowData.Producto,
-      [headers.P_Venta]: rowData.P_Venta,
-      [headers.Stock]: rowData.Stock,
-      [headers.Proveedor]: rowData.Proveedor,
-    };
-  });
+  const dataExport = data.map((item) => ({
+    "ID": item.id,
+    "Producto": item.nombreProducto, // Cambiado de item.Producto
+    "Precio Venta": item.precioVenta, // Cambiado de item.P_Venta
+    "Stock": item.stock,
+    "Categoría": item.categoria,
+    // Elimina Proveedor si no está en los datos
+  }));
 
   const worksheet = XLSX.utils.json_to_sheet(dataExport);
   const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "Inventario");
-  XLSX.writeFile(workbook, "inventario.xlsx");
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Stock Bajo");
+  XLSX.writeFile(workbook, "productos_stock_bajo.xlsx");
 };
 
 
@@ -165,7 +138,7 @@ const exportToXLSX = () => {
             placeholder="Filtrar por Producto..."
             value={table.getColumn("Producto")?.getFilterValue() ?? ""}
             onChange={(event) =>
-            table.getColumn("Producto")?.setFilterValue(event.target.value)
+            table.getColumn("nombreProducto")?.setFilterValue(event.target.value)
             }
             className="w-1/2"
         />

@@ -22,6 +22,11 @@ class Services {
   eliminarProducto(id) {
     return axios.delete(`${PRODUCTO_BASE_REST_API_URL}/${id}`);
   }
+
+  obtenerProductosConStockBajo() {
+    return axios.get(`${PRODUCTO_BASE_REST_API_URL}/stock-bajo`);
+  }
+
 }
 
 export default new Services();
