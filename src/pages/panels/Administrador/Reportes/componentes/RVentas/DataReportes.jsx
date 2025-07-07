@@ -30,10 +30,16 @@ export const columns = [
     accessorKey: "id",
     header: "ID",
   },
-  {
-    accessorKey: "cliente", // Ajustado para coincidir con el backend
+ {
+    accessorKey: "cliente",
     header: "Cliente",
+    cell: ({ row }) => {
+      const cliente = row.original.cliente;
+      if (!cliente) return "Sin cliente";
+      return `${cliente.nombre} ${cliente.apellidos}`;
+    },
   },
+
   {
     accessorKey: "metodoPago", // Ajustado para coincidir con el backend
     header: "Método de Pago",
@@ -51,11 +57,11 @@ export const columns = [
     },
   },
   {
-    accessorKey: "fecha", // Ajustado para coincidir con el backend
+    accessorKey: "fechaVenta", // Ajustado para coincidir con el backend
     header: "Fecha",
     cell: ({ row }) => {
-      const fecha = row.getValue("fecha");
-      return format(new Date(fecha), "dd/MM/yyyy");
+      const fecha = row.getValue("fechaVenta");
+       return fecha ? format(new Date(fecha), "dd/MM/yyyy") : "Sin fecha";
     },
   },
 ];
@@ -119,74 +125,77 @@ export function RVTable() {
     },
   });
 
-  // Función para imprimir la tabla
-  const handlePrint = () => {
-    const printWindow = window.open("", "_blank");
-    printWindow.document.write(`
-      <html>
-        <head>
-          <title>Reporte de Ventas</title>
-          <style>
-            body { font-family: Arial, sans-serif; }
-            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-            th { background-color: #f2f2f2; }
-            .text-right { text-align: right; }
-            .header { margin-bottom: 20px; }
-            .totals { margin-bottom: 20px; display: flex; justify-content: space-between; }
-          </style>
-        </head>
-        <body>
-          <h1 class="header">Reporte de Ventas</h1>
-          <div class="totals">
-            <div>
-              <strong>Ingreso de ventas:</strong> S/. ${totalVentas.toLocaleString("es-PE", { minimumFractionDigits: 2 })}
-            </div>
-            <div>
-              <strong>Número de Ventas Totales:</strong> ${cantidadVentas}
-            </div>
+ const handlePrint = () => {
+  const printWindow = window.open("", "_blank");
+  printWindow.document.write(`
+    <html>
+      <head>
+        <title>Reporte de Ventas</title>
+        <style>
+          body { font-family: Arial, sans-serif; }
+          table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+          th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+          th { background-color: #f2f2f2; }
+          .text-right { text-align: right; }
+          .header { margin-bottom: 20px; }
+          .totals { margin-bottom: 20px; display: flex; justify-content: space-between; }
+        </style>
+      </head>
+      <body>
+        <h1 class="header">Reporte de Ventas</h1>
+        <div class="totals">
+          <div>
+            <strong>Ingreso de ventas:</strong> S/. ${totalVentas.toLocaleString("es-PE", { minimumFractionDigits: 2 })}
           </div>
-          <table>
-            <thead>
-              <tr>
-                ${table.getHeaderGroups()[0].headers.map(header => 
-                  `<th>${header.column.columnDef.header}</th>`
-                ).join("")}
-              </tr>
-            </thead>
-            <tbody>
-              ${table.getRowModel().rows.map(row => `
+          <div>
+            <strong>Número de Ventas Totales:</strong> ${cantidadVentas}
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Cliente</th>
+              <th>Método de Pago</th>
+              <th>Total</th>
+              <th>Fecha</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${table.getRowModel().rows.map(row => {
+              const venta = row.original;
+              const cliente = venta.cliente ? `${venta.cliente.nombre} ${venta.cliente.apellidos}` : "Sin cliente";
+              const total = new Intl.NumberFormat("es-PE", {
+                style: "currency",
+                currency: "PEN",
+              }).format(venta.total);
+              const fecha = venta.fechaVenta ? format(new Date(venta.fechaVenta), "dd/MM/yyyy") : "Sin fecha";
+
+              return `
                 <tr>
-                  ${row.getVisibleCells().map(cell => `
-                    <td class="${cell.column.id === "total" ? "text-right" : ""}">
-                      ${cell.column.id === "total" ? 
-                        new Intl.NumberFormat("es-PE", {
-                          style: "currency",
-                          currency: "PEN",
-                        }).format(cell.getValue()) :
-                        (cell.column.id === "fecha" ? 
-                          format(new Date(cell.getValue()), "dd/MM/yyyy") : 
-                          cell.getValue())
-                      }
-                    </td>
-                  `).join("")}
-                </tr>
-              `).join("")}
-            </tbody>
-          </table>
-          <script>
-            window.onload = function() {
-              setTimeout(function() {
-                window.print();
-                window.close();
-              }, 200);
-            };
-          </script>
-        </body>
-      </html>
-    `);
-    printWindow.document.close();
-  };
+                  <td>${venta.id}</td>
+                  <td>${cliente}</td>
+                  <td>${venta.metodoPago}</td>
+                  <td class="text-right">${total}</td>
+                  <td>${fecha}</td>
+                </tr>`;
+            }).join("")}
+          </tbody>
+        </table>
+        <script>
+          window.onload = function() {
+            setTimeout(function() {
+              window.print();
+              window.close();
+            }, 200);
+          };
+        </script>
+      </body>
+    </html>
+  `);
+  printWindow.document.close();
+};
+
 
   if (loading) {
     return <div>Cargando ventas...</div>;

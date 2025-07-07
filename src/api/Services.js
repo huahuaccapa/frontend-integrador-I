@@ -26,6 +26,7 @@ class Services {
   obtenerProductosConStockBajo() {
     return axios.get(`${PRODUCTO_BASE_REST_API_URL}/stock-bajo`);
   }
+  
 
 }
 
