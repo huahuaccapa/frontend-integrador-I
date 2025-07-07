@@ -20,7 +20,7 @@ export const columns = [
   { accessorKey: "nombre", header: "Cliente" },
   { accessorKey: "metodoPago", header: "Método de Pago" },
   { accessorKey: "fechaUltimaCompra", header: "Fecha de última Compra" },
-  { accessorKey: "cantidadCompras", header: "Cant. de Compras" },
+  { accessorKey: "comprasTotales", header: "Cant. de Compras" },//cambiando la variable
   {
     id: "Historial",
     enableHiding: false,
