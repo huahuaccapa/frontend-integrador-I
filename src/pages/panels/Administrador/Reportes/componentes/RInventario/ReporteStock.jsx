@@ -193,4 +193,3 @@ const exportToXLSX = () => {
     </div>
   );
 }
-

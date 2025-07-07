@@ -290,4 +290,3 @@ const exportToXLSX = () => {
     </div>
   );
 }
-

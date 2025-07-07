@@ -203,7 +203,6 @@ export function RVTable() {
 
   return (
     <div className="w-full">
-      {/* Encabezado con totales */}
       <div className="grid grid-cols-2 justify-center mb-4">
         <div className="text-black">
           <h1 className="font-bold">Ingreso de ventas</h1>
@@ -226,24 +225,22 @@ export function RVTable() {
           className="max-w-sm"
         />
 
-        {/* Rangos de fechas */}
         <div className="flex gap-4">
-          <div className="bg-white rounded-lg">
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn("w-[240px] justify-start text-left", !startDate && "text-muted-foreground")}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {startDate ? format(startDate, "PPP") : <span>Fecha inicio</span>}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar mode="single" selected={startDate} onSelect={setStartDate} initialFocus />
-              </PopoverContent>
-            </Popover>
-          </div>
+          {[{label: "Fecha inicio", date: startDate, set: setStartDate}, {label: "Fecha fin", date: endDate, set: setEndDate}].map(({label, date, set}, i) => (
+            <div key={i} className="bg-white rounded-lg">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className={cn("w-[240px] justify-start text-left", !date && "text-muted-foreground")}> 
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {date ? format(date, "PPP") : <span>{label}</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar mode="single" selected={date} onSelect={set} initialFocus />
+                </PopoverContent>
+              </Popover>
+            </div>
+          ))}
 
           <div className="bg-white rounded-lg">
             <Popover>
@@ -270,17 +267,14 @@ export function RVTable() {
         </div>
       </div>
 
-      {/* Tabla */}
       <div className="rounded-md border">
         <Table>
           <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
+            {table.getHeaderGroups().map(headerGroup => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
+                {headerGroup.headers.map(header => (
                   <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
+                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                   </TableHead>
                 ))}
               </TableRow>
@@ -288,9 +282,9 @@ export function RVTable() {
           </TableHeader>
           <TableBody>
             {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
+              table.getRowModel().rows.map(row => (
                 <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-                  {row.getVisibleCells().map((cell) => (
+                  {row.getVisibleCells().map(cell => (
                     <TableCell key={cell.id}>
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
