@@ -1,4 +1,3 @@
-// components/DetalleCompraModal.jsx
 import React, { useMemo } from "react";
 import {
   useReactTable,
@@ -25,44 +24,46 @@ import {
 export function DetalleCompraModal({ open, onClose, compra, cliente }) {
   if (!compra) return null;
 
-  // Datos estáticos de ejemplo
-  const data = [
-    { Producto: "Producto 1", Detalle: "—", Cantidad: 1, Unidad: 65 },
-    { Producto: "Producto 2", Detalle: "—", Cantidad: 3, Unidad: 65 },
-    { Producto: "Producto 3", Detalle: "—", Cantidad: 2, Unidad: 65 },
-  ];
-
-  // Agregar el subtotal calculado
-  const dataConSubtotal = useMemo(() =>
-    data.map((item) => ({
-      ...item,
-      Subtotal: item.Cantidad * item.Unidad,
-    }))
-  , []);
+  const dataConSubtotal = useMemo(() => {
+    const detalles = compra?.rawData?.detalles || [];
+    return detalles.map((item) => ({
+      Producto: item.producto?.nombreProducto || "Desconocido",
+      Detalle: item.producto?.descripcion || "—",
+      Cantidad: item.cantidad,
+      Unidad: item.precioUnitario,
+      Subtotal: item.subtotal,
+    }));
+  }, [compra]);
 
   const columns = useMemo(
     () => [
       { accessorKey: "Producto", header: "Producto" },
       { accessorKey: "Detalle", header: "Detalle" },
       { accessorKey: "Cantidad", header: "Cantidad" },
-      { accessorKey: "Unidad", header:() => <div className="text-right">P. Unitario</div>,
-          cell: ({ row }) => {
-            const amount = parseFloat(row.getValue("Unidad"));
-            const formatted = new Intl.NumberFormat("es-PE", {
-              style: "currency",
-              currency: "PEN",
-            }).format(amount);
-            return <div className="text-right font-medium">{formatted}</div>;
-          }, },
-      { accessorKey: "Subtotal", header: () => <div className="text-right">Subtotal</div>,
-          cell: ({ row }) => {
-            const amount = parseFloat(row.getValue("Subtotal"));
-            const formatted = new Intl.NumberFormat("es-PE", {
-              style: "currency",
-              currency: "PEN",
-            }).format(amount);
-            return <div className="text-right font-medium">{formatted}</div>;
-          }, },
+      {
+        accessorKey: "Unidad",
+        header: () => <div className="text-right">P. Unitario</div>,
+        cell: ({ row }) => {
+          const amount = parseFloat(row.getValue("Unidad"));
+          const formatted = new Intl.NumberFormat("es-PE", {
+            style: "currency",
+            currency: "PEN",
+          }).format(amount);
+          return <div className="text-right font-medium">{formatted}</div>;
+        },
+      },
+      {
+        accessorKey: "Subtotal",
+        header: () => <div className="text-right">Subtotal</div>,
+        cell: ({ row }) => {
+          const amount = parseFloat(row.getValue("Subtotal"));
+          const formatted = new Intl.NumberFormat("es-PE", {
+            style: "currency",
+            currency: "PEN",
+          }).format(amount);
+          return <div className="text-right font-medium">{formatted}</div>;
+        },
+      },
     ],
     []
   );
@@ -77,14 +78,24 @@ export function DetalleCompraModal({ open, onClose, compra, cliente }) {
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-3xl">
         <DialogHeader>
-          <DialogTitle>Detalle de la Compra #{compra.Nro_Compra}</DialogTitle>
+          <DialogTitle>
+            Detalle de la Compra #{compra.Nro_Compra}
+          </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-2 text-sm">
-          <p><strong>Cliente:</strong> {cliente?.Cliente}</p>
-          <p><strong>RUC:</strong> {cliente?.RUC}</p>
-          <p><strong>Método de Pago:</strong> {compra.Metodo}</p>
-          <p><strong>Fecha:</strong> {compra.Fecha}</p>
+          <p>
+            <strong>Cliente:</strong> {cliente?.nombre}
+          </p>
+          <p>
+            <strong>RUC:</strong> {cliente?.ruc || cliente?.identificacion}
+          </p>
+          <p>
+            <strong>Método de Pago:</strong> {compra.Metodo}
+          </p>
+          <p>
+            <strong>Fecha:</strong> {compra.Fecha}
+          </p>
         </div>
 
         <div className="mt-4 rounded-md border">
