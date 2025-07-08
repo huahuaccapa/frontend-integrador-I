@@ -1,9 +1,23 @@
-import React, { useState } from "react";
-import { flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table";
+import React, { useState, useEffect } from "react";
+import {
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/custom/button";
 import { Separator } from "@/components/ui/separator";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Eye } from "lucide-react";
 import {
   Tooltip,
@@ -11,20 +25,16 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { DetalleCompraModal } from "./ModalHistorial"
+import { DetalleCompraModal } from "./ModalHistorial";
 import * as XLSX from "xlsx";
-
-// Datos
-const data = [
-  { Nro_Compra: "00123", Cant_Prod: 3 , Metodo: "YAPE", Fecha: "12/06/2025" },
-  { Nro_Compra: "00122", Cant_Prod: 10 , Metodo: "YAPE", Fecha: "15/06/2025" },
-  { Nro_Compra: "00124", Cant_Prod: 20 , Metodo: "YAPE", Fecha: "15/06/2025" },
-];
+import ServiceVentas from "@/api/ServiceVentas";
 
 export function HistorialCliente() {
   const { state } = useLocation();
   const cliente = state?.cliente;
   const navigate = useNavigate();
+
+  const [ventas, setVentas] = useState([]);
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
   const [columnVisibility, setColumnVisibility] = useState({});
@@ -38,8 +48,45 @@ export function HistorialCliente() {
     setModalOpen(true);
   };
 
+ useEffect(() => {
+  const fetchVentas = async () => {
+    try {
+      const response = await ServiceVentas.getAllVentas();
+      const todasVentas = response.data;
+
+      console.log("Cliente recibido:", cliente);
+      console.log("Ventas totales:", todasVentas);
+
+      if (!cliente?.ruc) return;
+
+      const ventasCliente = todasVentas
+        .filter((venta) => {
+          const match = venta.cliente?.identificacion === cliente.ruc;
+          console.log(
+            `¿Venta pertenece al cliente? ${match} → Venta ID: ${venta.id}, Identificación: ${venta.cliente?.identificacion}`
+          );
+          return match;
+        })
+        .map((venta, index) => ({
+          Nro_Compra: String(index + 1).padStart(5, "0"),
+          Cant_Prod: venta.detalles.reduce((acc, d) => acc + d.cantidad, 0),
+          Metodo: venta.metodoPago,
+          Fecha: new Date(venta.fechaVenta).toLocaleDateString(),
+          rawData: venta,
+        }));
+
+      setVentas(ventasCliente);
+    } catch (error) {
+      console.error("Error al cargar ventas:", error);
+    }
+  };
+
+  fetchVentas();
+}, [cliente]);
+
+
   const table = useReactTable({
-    data,
+    data: ventas,
     columns: [
       { accessorKey: "Nro_Compra", header: "Nro. Compra" },
       { accessorKey: "Cant_Prod", header: "Cant. Productos" },
@@ -51,7 +98,6 @@ export function HistorialCliente() {
         header: () => <div className="text-center">Detalles</div>,
         cell: ({ row }) => {
           const compra = row.original;
-
           return (
             <div className="flex justify-center gap-2">
               <TooltipProvider>
@@ -93,51 +139,65 @@ export function HistorialCliente() {
   });
 
   if (!cliente) {
-    return <p className="p-4 text-red-500">No se encontró información del cliente.</p>;
+    return (
+      <p className="p-4 text-red-500">
+        No se encontró información del cliente.
+      </p>
+    );
   }
 
-   // Para exportar en XLSX
-    const exportToXLSX = () => {
-      const rows = table.getRowModel().rows;
-    
-      if (rows.length === 0) {
-        alert("No hay datos para exportar.");
-        return;
-      }
-    
-      const headers = {
-        Nro_Compra: "Nro. Compra",
-        Cant_Prod: "Cant. Productos",
-        Metodo: "Método de Pago",
-        Fecha: "Fecha de ultima Compra",
-      };
-    
-      const dataExport = rows.map((row) => {
-        const rowData = row.original;
-        return {
-          [headers.Nro_Compra]: rowData.Nro_Compra,
-          [headers.Cant_Prod]: rowData.Cant_Prod,
-          [headers.Metodo]: rowData.Metodo,
-          [headers.Fecha]: rowData.Fecha,
-        };
-      });
-    
-      const worksheet = XLSX.utils.json_to_sheet(dataExport);
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, "Historial_Cliente");
-      XLSX.writeFile(workbook, `RHistorial_${cliente.Cliente}.xlsx`);
+  const exportToXLSX = () => {
+    const rows = table.getRowModel().rows;
+    if (rows.length === 0) {
+      alert("No hay datos para exportar.");
+      return;
+    }
+
+    const headers = {
+      Nro_Compra: "Nro. Compra",
+      Cant_Prod: "Cant. Productos",
+      Metodo: "Método de Pago",
+      Fecha: "Fecha de última Compra",
     };
+
+    const dataExport = rows.map((row) => {
+      const rowData = row.original;
+      return {
+        [headers.Nro_Compra]: rowData.Nro_Compra,
+        [headers.Cant_Prod]: rowData.Cant_Prod,
+        [headers.Metodo]: rowData.Metodo,
+        [headers.Fecha]: rowData.Fecha,
+      };
+    });
+
+    const worksheet = XLSX.utils.json_to_sheet(dataExport);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Historial_Cliente");
+    XLSX.writeFile(workbook, `RHistorial_${cliente.nombre}.xlsx`);
+  };
 
   return (
     <div className="p-4 space-y-4">
-      <h1 className="font-bold text-black text-2xl mb-4">Reportes / Clientes</h1>
+      <h1 className="font-bold text-black text-2xl mb-4">
+        Reportes / Clientes
+      </h1>
       <Separator className="my-2" />
       <div className="grid grid-cols-2 gap-4">
-        <div className="text-xl font-bold text-gray-800">Historial de Compras de: {cliente.Cliente}</div>
-        <div><strong>RUC:</strong> {cliente.RUC}</div>
+        <div className="text-xl font-bold text-gray-800">
+          Historial de Compras de: {cliente.nombre}
+        </div>
+        <div>
+          <strong>RUC:</strong> {cliente.ruc || cliente.identificacion}
+        </div>
         <div className="font-bold text-black text-xl">Registro de Compras</div>
-        <div> <Button className="bg-white text-black font-bold border-4 border-green-500 hover:bg-green-100"
-            onClick={exportToXLSX}>Exportar XLSX</Button></div>
+        <div>
+          <Button
+            className="bg-white text-black font-bold border-4 border-green-500 hover:bg-green-100"
+            onClick={exportToXLSX}
+          >
+            Exportar XLSX
+          </Button>
+        </div>
       </div>
 
       <div className="rounded-md border">
@@ -149,7 +209,10 @@ export function HistorialCliente() {
                   <TableHead key={header.id}>
                     {header.isPlaceholder
                       ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                   </TableHead>
                 ))}
               </TableRow>
@@ -158,17 +221,23 @@ export function HistorialCliente() {
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
+                <TableCell colSpan={5} className="h-24 text-center">
                   No hay resultados.
                 </TableCell>
               </TableRow>
@@ -179,7 +248,6 @@ export function HistorialCliente() {
 
       <Button onClick={() => navigate(-1)}>Volver</Button>
 
-      {/* Modal */}
       <DetalleCompraModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
