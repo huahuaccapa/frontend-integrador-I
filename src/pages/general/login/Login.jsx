@@ -45,7 +45,7 @@ export default function Login() {
 
         // Redirigir según el rol
         const redirectPath = response.data.role === 'ADMIN' 
-          ? '/dashboard/clientes' 
+          ? '/dashboard' 
           : '/dashboard/ventas';
         
         navigate(redirectPath);
