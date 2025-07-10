@@ -14,6 +14,14 @@ export function NuevoPedido() {
   const navigate = useNavigate();
   const location = useLocation();
   
+    // Al inicio del componente o dentro de useEffect según tu estructura
+const hoy = new Date();
+const fechaMinima = new Date(hoy);
+fechaMinima.setDate(hoy.getDate() + 4);
+
+// Convertirla a formato YYYY-MM-DD para usar en el input
+const fechaMinimaStr = fechaMinima.toISOString().split('T')[0];
+
   // Detectar si estamos en modo edición
   const isEditing = location.state?.isEditing || false;
   const pedidoData = location.state?.pedidoData || null;
@@ -21,12 +29,14 @@ export function NuevoPedido() {
   const [productos, setProductos] = useState([]);
   const [proveedor, setProveedor] = useState(null);
   const [modalData, setModalData] = useState(null);
-  const [fechaEntrega, setFechaEntrega] = useState("");
+  const [fechaEntrega, setFechaEntrega] = useState(fechaMinimaStr);
   const [modoPago, setModoPago] = useState("Cancelado");
   const [nroPedido, setNroPedido] = useState("003");
 
   const [proveedores, setProveedores] = useState([]);
   const [cargando, setCargando] = useState(false);
+
+
 
 useEffect(() => {
   console.log("Estado actual:", {
@@ -390,11 +400,12 @@ const handleGuardar = async () => {
             </div>
           </div>
           <div className="flex items-center space-x-4">
-            <label className="text-sm font-semibold">Fecha de Entrega:</label>
+            <label className="text-sm font-semibold">Fecha de Entrega Provista:</label>
             <Input
               type="date"
               value={fechaEntrega}
               onChange={(e) => setFechaEntrega(e.target.value)}
+              min={fechaMinimaStr}
             />
           </div>
           <div className="flex items-center space-x-4">
