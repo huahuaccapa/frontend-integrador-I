@@ -31,7 +31,7 @@ const fechaMinimaStr = fechaMinima.toISOString().split('T')[0];
   const [modalData, setModalData] = useState(null);
   const [fechaEntrega, setFechaEntrega] = useState(fechaMinimaStr);
   const [modoPago, setModoPago] = useState("Cancelado");
-  const [nroPedido, setNroPedido] = useState("003");
+  const [nroPedido, setNroPedido] = useState(""); 
 
   const [proveedores, setProveedores] = useState([]);
   const [cargando, setCargando] = useState(false);
@@ -295,12 +295,15 @@ const handleGuardar = async () => {
       </h1>
 
       {/* Nro de pedido */}
-      <div className="flex items-center space-x-4">
-        <label className="text-sm font-semibold">Nro de Pedido:</label>
-        <div className="px-4 py-2 bg-gray-100 rounded-md border text-gray-700">
-          {nroPedido}
-        </div>
-      </div>
+      {isEditing && (
+  <div className="flex items-center space-x-4">
+    <label className="text-sm font-semibold">Nro de Pedido:</label>
+    <div className="px-4 py-2 bg-gray-100 rounded-md border text-gray-700">
+      {nroPedido}
+    </div>
+  </div>
+)}
+
 
       {/* Proveedor */}
       <div className="flex items-center space-x-4">
