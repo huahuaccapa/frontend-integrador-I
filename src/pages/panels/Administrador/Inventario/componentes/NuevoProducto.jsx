@@ -43,7 +43,7 @@ export function Producto() {
   const [urlInput, setUrlInput] = useState("")
   const [isUploading, setIsUploading] = useState(false)
   const navigate = useNavigate();
-
+  const [proveedores, setProveedores] = useState([])
   const [producto, setProducto] = useState({
     nombreProducto: "",
     categoria: "",
@@ -58,6 +58,7 @@ export function Producto() {
     codigo: "",
     fechaAdquisicion: "",
     imagenes: [],
+    proveedorId: null // CAMBIO: usar proveedorId directamente
   })
 
   useEffect(() => {
@@ -67,6 +68,18 @@ export function Producto() {
   useEffect(() => {
     setProducto(prev => ({ ...prev, fechaAdquisicion: date }))
   }, [date])
+
+  useEffect(() => {
+    const cargarProveedores = async () => {
+      try {
+        const response = await axios.get('http://localhost:8080/api/v1/productos/proveedores');
+        setProveedores(response.data);
+      } catch (error) {
+        console.error('Error al cargar proveedores:', error);
+      }
+    };
+    cargarProveedores();
+  }, []);
 
   const handleAddUrlImage = () => {
     if (urlInput.trim() !== "") {
@@ -104,6 +117,12 @@ export function Producto() {
 
   const handleGuardarProducto = async () => {
     try {
+      // Validar que se haya seleccionado un proveedor
+      if (!producto.proveedorId) {
+        window.alert("⚠️ Por favor seleccione un proveedor");
+        return;
+      }
+
       const response = await axios.post("http://localhost:8080/api/v1/productos", {
         ...producto,
         fechaAdquisicion: formatDate(date),
@@ -149,6 +168,24 @@ export function Producto() {
                   <SelectLabel>Categorías</SelectLabel>
                   <SelectItem value="accesorios">Accesorios</SelectItem>
                   <SelectItem value="repuestos">Repuestos</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+
+            {/* Proveedor */}
+            <label className='p-2 font-bold'>Proveedor</label>
+            <Select onValueChange={(val) => setProducto({ ...producto, proveedorId: parseInt(val) })}>
+              <SelectTrigger className="p-2 m-2 w-full">
+                <SelectValue placeholder="Seleccione un Proveedor" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Proveedores</SelectLabel>
+                  {proveedores.map((proveedor) => (
+                    <SelectItem key={proveedor.id} value={proveedor.id.toString()}>
+                      {proveedor.nombre}
+                    </SelectItem>
+                  ))}
                 </SelectGroup>
               </SelectContent>
             </Select>
