@@ -1,4 +1,3 @@
-//src\pages\panels\Administrador\Cliente\Components\NewClient.jsx
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -10,10 +9,13 @@ import {
 import { FormCliente } from "./FormCliente";
 
 export function RegistrarCliente({ onClienteAdded }) {
-  const isAdmin = localStorage.getItem('userRole') === 'ADMIN';
+  const userRole = localStorage.getItem('userRole');
+  const isAdmin = userRole === 'ADMIN';
+  const isEmpleado = userRole === 'EMPLEADO';
 
-  if (!isAdmin) {
-    return null; // No renderiza nada si no es admin
+  // Permitir acceso solo a ADMIN o EMPLEADO
+  if (!isAdmin && !isEmpleado) {
+    return null;
   }
 
   return (
