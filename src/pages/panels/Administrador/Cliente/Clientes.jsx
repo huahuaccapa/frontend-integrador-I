@@ -1,4 +1,3 @@
-//src\pages\panels\Administrador\Cliente\Clientes.jsx
 import { useState, useEffect } from 'react';
 import { ClienteTable } from './Components/ClienteTable/ClienteTable';
 import { RegistrarCliente } from './Components/NewClient';
@@ -13,8 +12,11 @@ export function Clientes() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  
-  const isAdmin = localStorage.getItem('userRole') === 'ADMIN';
+
+  const userRole = localStorage.getItem('userRole');
+  const isAdmin = userRole === 'ADMIN';
+  const isEmpleado = userRole === 'EMPLEADO';
+  const puedeRegistrarCliente = isAdmin || isEmpleado;
 
   const fetchClientes = async () => {
     setLoading(true);
@@ -58,7 +60,7 @@ export function Clientes() {
   return (
     <div className="p-4">
       <div className="flex justify-between items-center mb-4">
-        {isAdmin && <RegistrarCliente onClienteAdded={fetchClientes} />}
+        {puedeRegistrarCliente && <RegistrarCliente onClienteAdded={fetchClientes} />}
         <Input
           type="text"
           placeholder="Buscar clientes..."
@@ -67,7 +69,6 @@ export function Clientes() {
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
-      
       {loading ? (
         <div className="flex justify-center items-center h-64">
           <p>Cargando clientes...</p>
@@ -83,7 +84,6 @@ export function Clientes() {
       ) : (
         <ClienteTable clientes={filteredClientes} onClienteDeleted={fetchClientes} />
       )}
-      
       <Toaster />
     </div>
   );
