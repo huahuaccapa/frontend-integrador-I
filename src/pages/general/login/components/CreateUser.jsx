@@ -45,7 +45,7 @@ export default function CreateUser() {
           username: formData.username,
           password: formData.password,
           email: formData.email,
-          role: 'EMPLEADO' // Rol fijo para nuevos usuarios
+          role: 'EMPLEADO'
         },
         {
           headers: {
@@ -62,7 +62,7 @@ export default function CreateUser() {
       }
     } catch (err) {
       setError(
-        err.response?.data || 
+        err.response?.data ||
         'Error al crear el usuario. Verifica los datos e intenta nuevamente.'
       );
     }
