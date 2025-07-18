@@ -23,6 +23,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import ServiceReporte from "@/api/ServiceReporte";
+import ServiceVentas from "@/api/ServiceVentas";
 const inventoryData = [
   { month: "Jan", inventory: 8000 },
   { month: "Feb", inventory: 19000 },
@@ -45,6 +46,7 @@ const chartConfig = {
 
 export function DashboardAdm() {
   const [topProductsData, setTopProductsData] = useState([]);
+  const [totalVentas, setTotalVentas] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -74,7 +76,19 @@ export function DashboardAdm() {
     }
   };
 
-  fetchTopProducts();
+  const fetchTotalVentas = async () => {
+      try {
+        const response = await ServiceVentas.getTotalVentas();
+        setTotalVentas(response.data); 
+      } catch (err) {
+        console.error("Error al obtener total de ventas:", err);
+        setTotalVentas(0);
+      }
+    };
+
+    fetchTopProducts();
+    fetchTotalVentas();
+
 }, []);
 
   if (loading) {
@@ -139,7 +153,7 @@ export function DashboardAdm() {
         <MetricCard
           color="text-green-400"
           title="Total Order"
-          value="9,569"
+          value={totalVentas}
         />
       </div>
 
