@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/chart";
 import ServiceReporte from "@/api/ServiceReporte";
 import ServiceVentas from "@/api/ServiceVentas";
+import ServiceClientes from "@/api/ServiceClientes";
 const inventoryData = [
   { month: "Jan", inventory: 8000 },
   { month: "Feb", inventory: 19000 },
@@ -47,6 +48,7 @@ const chartConfig = {
 export function DashboardAdm() {
   const [topProductsData, setTopProductsData] = useState([]);
   const [totalVentas, setTotalVentas] = useState(0);
+  const [totalClientes, setTotalClientes] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -86,6 +88,17 @@ export function DashboardAdm() {
       }
     };
 
+    const fetchTotalClientes = async () => {
+    try {
+      const response = await ServiceClientes.contarClientes();
+      setTotalClientes(response.data); 
+    } catch (err) {
+      console.error("Error al obtener total de clientes:", err);
+      setTotalClientes(0);
+    }
+    };
+
+    fetchTotalClientes();
     fetchTopProducts();
     fetchTotalVentas();
 
@@ -147,7 +160,7 @@ export function DashboardAdm() {
         <MetricCard
           color="text-orange-400"
           title="Total Customer"
-          value="3,569"
+          value={totalClientes.toLocaleString()}
         />
 
         <MetricCard
