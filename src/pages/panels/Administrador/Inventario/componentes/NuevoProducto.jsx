@@ -25,7 +25,7 @@ const uploadImage = async (file) => {
   formData.append('file', file);
 
   try {
-    const response = await axios.post('http://localhost:8080/api/v1/upload', formData, {
+    const response = await axios.post('https://multiservicios-85dff762daa1.herokuapp.com/api/v1/upload', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -72,7 +72,7 @@ export function Producto() {
   useEffect(() => {
     const cargarProveedores = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/api/v1/productos/proveedores');
+        const response = await axios.get('https://multiservicios-85dff762daa1.herokuapp.com/api/v1/productos/proveedores');
         setProveedores(response.data);
       } catch (error) {
         console.error('Error al cargar proveedores:', error);
@@ -128,7 +128,7 @@ export function Producto() {
         return false;
       }
 
-      const response = await axios.post("http://localhost:8080/api/v1/productos", {
+      const response = await axios.post("https://multiservicios-85dff762daa1.herokuapp.com/api/v1/productos", {
         ...producto,
         fechaAdquisicion: formatDate(date),
       });

@@ -37,8 +37,8 @@ export function FormCliente({ onSuccess, cliente, isEdit = false }) {
 
       let response;
       const url = isEdit && cliente?.id 
-        ? `http://localhost:8080/api/clientes/${cliente.id}`
-        : 'http://localhost:8080/api/clientes';
+        ? `https://multiservicios-85dff762daa1.herokuapp.com/api/clientes/${cliente.id}`
+        : 'https://multiservicios-85dff762daa1.herokuapp.com/api/clientes';
       
       const method = isEdit ? 'put' : 'post';
       

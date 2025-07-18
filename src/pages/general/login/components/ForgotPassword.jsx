@@ -20,7 +20,7 @@ export default function ForgotPassword() {
 
     try {
       const response = await axios.post(
-        'http://localhost:8080/api/auth/forgot-password',
+        'https://multiservicios-85dff762daa1.herokuapp.com/api/auth/forgot-password',
         { email },
         {
           headers: {

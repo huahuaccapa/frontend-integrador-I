@@ -28,7 +28,7 @@ export default function Login() {
     try {
       setLoginError('');
       
-      const response = await axios.post('http://localhost:8080/api/auth/login', data, {
+      const response = await axios.post('https://multiservicios-85dff762daa1.herokuapp.com/api/auth/login', data, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -82,7 +82,7 @@ export default function Login() {
   const handlePasswordChange = async (newPassword) => {
     try {
       // Cambiar contraseña en el backend
-      await axios.put(`http://localhost:8080/api/auth/change-password?username=${tempAuth.username}`, {
+      await axios.put(`https://multiservicios-85dff762daa1.herokuapp.com/api/auth/change-password?username=${tempAuth.username}`, {
         password: newPassword
       });
 

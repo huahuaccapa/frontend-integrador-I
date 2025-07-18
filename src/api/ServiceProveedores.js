@@ -1,5 +1,5 @@
 import axios from "axios";
-const PROVEEDOR_BASE_REST_API_URL = "http://localhost:8080/api/v1/proveedores";
+const PROVEEDOR_BASE_REST_API_URL = "https://multiservicios-85dff762daa1.herokuapp.com/api/v1/proveedores";
 
 class ProveedoresService {
     

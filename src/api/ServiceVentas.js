@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const VENTA_BASE_REST_API_URL = "http://localhost:8080/api/ventas";
+const VENTA_BASE_REST_API_URL = "https://multiservicios-85dff762daa1.herokuapp.com/api/ventas";
 
 class VentaService {
   // 1. Obtener todas las ventas

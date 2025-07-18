@@ -5,7 +5,7 @@ const uploadImage = async (file) => {
   formData.append('file', file);
 
   try {
-    const response = await axios.post('http://localhost:8080/api/v1/upload', formData, {
+    const response = await axios.post('https://multiservicios-85dff762daa1.herokuapp.com/api/v1/upload', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },

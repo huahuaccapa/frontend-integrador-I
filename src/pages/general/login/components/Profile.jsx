@@ -27,7 +27,7 @@ export default function Profile() {
         }
 
         const response = await axios.get(
-          `http://localhost:8080/api/auth/profile/${authData.username}`
+          `hhttps://multiservicios-85dff762daa1.herokuapp.com/api/auth/profile/${authData.username}`
         );
         setProfile(response.data);
       } catch (err) {

@@ -1,5 +1,5 @@
 import axios from "axios";
-const API_BASE_URL = "http://localhost:8080/api/reportes";
+const API_BASE_URL = "https://multiservicios-85dff762daa1.herokuapp.com/api/reportes";
 
 class ServiceReporte {
     

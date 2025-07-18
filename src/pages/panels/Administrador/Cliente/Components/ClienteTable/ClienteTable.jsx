@@ -93,7 +93,7 @@ export  function ClienteTable({ clientes, onClienteDeleted }) {
       const confirmar = window.confirm("¿Estás seguro de eliminar este cliente?");
       if (!confirmar) return;
 
-      await axios.delete(`http://localhost:8080/api/clientes/${id}`);
+      await axios.delete(`https://multiservicios-85dff762daa1.herokuapp.com/api/clientes/${id}`);
       toast({
         title: "Éxito",
         description: "Cliente eliminado correctamente",

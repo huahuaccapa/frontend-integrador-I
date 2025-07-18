@@ -22,7 +22,7 @@ export function Clientes() {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get('http://localhost:8080/api/clientes');
+      const response = await axios.get('https://multiservicios-85dff762daa1.herokuapp.com/api/clientes');
       setClientes(response.data);
       setFilteredClientes(response.data);
     } catch (error) {

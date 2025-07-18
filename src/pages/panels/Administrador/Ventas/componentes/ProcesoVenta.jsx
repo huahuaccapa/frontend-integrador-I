@@ -62,7 +62,7 @@ export function ProcesoVenta(){
         setLoading(true);
         setError(null);
         try {
-            const response = await axios.get('http://localhost:8080/api/clientes');
+            const response = await axios.get('https://multiservicios-85dff762daa1.herokuapp.com/api/clientes');
             setClientes(response.data);
             setFilteredClientes(response.data);
         } catch (error) {
@@ -95,7 +95,7 @@ export function ProcesoVenta(){
         // Verificar stock antes de proceder (opcional)
         const verificacionStock = await Promise.all(
             productos.map(async producto => {
-                const response = await axios.get(`http://localhost:8080/api/productos/${producto.id}/stock`);
+                const response = await axios.get(`https://multiservicios-85dff762daa1.herokuapp.com/api/productos/${producto.id}/stock`);
                 return {
                     id: producto.id,
                     nombre: producto.nombre,

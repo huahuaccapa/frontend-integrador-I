@@ -40,7 +40,7 @@ export default function CreateUser() {
 
     try {
       const response = await axios.post(
-        'http://localhost:8080/api/auth/register',
+        'https://multiservicios-85dff762daa1.herokuapp.com/api/auth/register',
         {
           username: formData.username,
           password: formData.password,
