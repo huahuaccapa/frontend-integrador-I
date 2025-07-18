@@ -117,23 +117,33 @@ export function Producto() {
 
   const handleGuardarProducto = async () => {
     try {
-      // Validar que se haya seleccionado un proveedor
       if (!producto.proveedorId) {
         window.alert("⚠️ Por favor seleccione un proveedor");
-        return;
+        return false;
+      }
+
+      // Aquí podrías validar otros campos si deseas:
+      if (!producto.nombreProducto || !producto.categoria || !producto.precioCompra || !producto.precioVenta) {
+        window.alert("⚠️ Por favor complete todos los campos obligatorios.");
+        return false;
       }
 
       const response = await axios.post("http://localhost:8080/api/v1/productos", {
         ...producto,
         fechaAdquisicion: formatDate(date),
       });
+
       console.log("Producto guardado", response.data);
       window.alert("✅ Producto creado exitosamente!");
+      return true;
+
     } catch (error) {
       console.error("Error al guardar producto:", error);
-      window.alert("❌ Error al crear el producto");
+      window.alert("⚠️ Por favor complete todos los campos");
+      return false;
     }
   };
+
 
   return (
     <div>
@@ -305,10 +315,18 @@ export function Producto() {
               </SelectContent>
             </Select>
 
-            <Button onClick={() => {
-                handleGuardarProducto(); // primero guarda
-                navigate(-1);            // luego vuelve atrás
-              }} className='bg-black text-white my-10'>Guardar</Button>
+            <Button
+              onClick={async () => {
+                const exito = await handleGuardarProducto();
+                if (exito) {
+                  navigate(-1);
+                }
+              }}
+              className='bg-black text-white my-10'
+            >
+              Guardar
+            </Button>
+
           </div>
         </div>
 
@@ -320,9 +338,9 @@ export function Producto() {
               <div className="absolute top-2 right-2 flex space-x-2">
                 <label className="bg-white p-1 rounded-md shadow hover:bg-gray-100 cursor-pointer">
                   <Upload size={16} />
-                  <input 
-                    type="file" 
-                    className="hidden" 
+                  <input
+                    type="file"
+                    className="hidden"
                     onChange={handleFileUpload}
                     accept="image/*"
                   />
@@ -339,9 +357,9 @@ export function Producto() {
               <label className="flex flex-col items-center justify-center w-full h-full">
                 <ImagePlus size={32} />
                 <span className="text-sm mt-2">Agregar imagen principal</span>
-                <input 
-                  type="file" 
-                  className="hidden" 
+                <input
+                  type="file"
+                  className="hidden"
                   onChange={handleFileUpload}
                   accept="image/*"
                 />
@@ -367,9 +385,9 @@ export function Producto() {
               <label className="size-24 rounded-xl border-2 border-dashed flex flex-col items-center justify-center cursor-pointer hover:bg-emerald-300 transition">
                 <ImagePlus size={20} />
                 <span className="text-xs text-center mt-1">Agregar imagen</span>
-                <input 
-                  type="file" 
-                  className="hidden" 
+                <input
+                  type="file"
+                  className="hidden"
                   onChange={handleFileUpload}
                   accept="image/*"
                 />
