@@ -23,6 +23,11 @@ class VentaService {
     return axios.get(`${VENTA_BASE_REST_API_URL}/ingresos-totales`);
   }
 
+  // 5. Obtener ventas realizadas hoy
+  getVentasHoy() {
+    return axios.get(`${VENTA_BASE_REST_API_URL}/ventas-hoy`);
+  }
+
 }
 
 export default new VentaService();

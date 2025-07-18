@@ -56,6 +56,8 @@ export function DashboardAdm() {
   const [ingresosTotales, setIngresosTotales] = useState(0);
   const [totalStock, setTotalStock] = useState(0);
   const [productosBajoStock, setProductosBajoStock] = useState(0);
+  const [ventasHoy, setVentasHoy] = useState(0);
+  const [inventarioMensual, setInventarioMensual] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -143,7 +145,27 @@ export function DashboardAdm() {
       console.error("Error al obtener la cantidad de productos con stock: ",err)
       setProductosBajoStock(0);
     }
+  };
+
+  const fetchVentasHoy = async () => {
+  try {
+    const response = await ServiceVentas.getVentasHoy();
+    setVentasHoy(response.data);
+  } catch (err) {
+    console.error("Error al obtener ventas del día:", err);
+    setVentasHoy(0);
   }
+  };
+
+  const fetchInventarioMensual = async () => {
+    try {
+      const response = await Services.obtenerInventarioMensual();
+      setInventarioMensual(response.data);
+    } catch (error) {
+      console.error("Error al obtener inventario mensual", error);
+    }
+  };
+
 
     fetchTotalExpenses();
     fetchTotalClientes();
@@ -152,6 +174,8 @@ export function DashboardAdm() {
     fetchIngresosTotales();
     fetchTotalStock();
     fetchProductosBajoStock();
+    fetchVentasHoy();
+    fetchInventarioMensual();
 
 }, []);
 
@@ -177,19 +201,19 @@ export function DashboardAdm() {
       <div className="grid grid-cols-3 gap-4 mb-6">
         <StatCard
           icon={<ChartNoAxesCombined className="w-6 h-6" />}
-          title={totalStock}
+          title={`${totalStock} Items`}
           subtitle={"Productos totales en Stock"}
         />
 
         <StatCard
           icon={<AlertTriangle className="w-6 h-6" />}
-          title={productosBajoStock}
+          title={`${productosBajoStock} Bajo Stock`}
           subtitle="Alertas Críticas"
         />
 
         <StatCard
           icon={<Settings className="w-6 h-6" />}
-          title="18 Ventas en el dia"
+          title={`${ventasHoy} Ventas en el dia`}
           subtitle="Ventas"
         />
       </div>
@@ -273,10 +297,10 @@ export function DashboardAdm() {
             Niveles de Inventario Mensuales
           </h2>
           <ChartContainer config={chartConfig} className="h-64 w-full">
-            <LineChart data={inventoryData}>
+            <LineChart data={inventarioMensual}>
               <CartesianGrid stroke="#3f3f46" />
               <XAxis
-                dataKey="month"
+                dataKey="mes"
                 tick={{ fill: "#a1a1aa", fontSize: 12 }}
                 tickLine={false}
                 axisLine={false}
@@ -285,7 +309,7 @@ export function DashboardAdm() {
               <ChartTooltip content={<ChartTooltipContent />} />
               <Line
                 type="monotone"
-                dataKey="inventory"
+                dataKey="cantidad"
                 stroke="#facc15"
                 strokeWidth={2}
                 dot={{ r: 4, fill: "#facc15" }}

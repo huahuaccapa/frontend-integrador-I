@@ -37,6 +37,11 @@ class Services {
   contarProductosConStockBajo() {
     return axios.get(`${PRODUCTO_BASE_REST_API_URL}/count/stock-bajo`);
   }
+
+   // 8. Obtener inventario mensual
+  obtenerInventarioMensual() {
+    return axios.get(`${PRODUCTO_BASE_REST_API_URL}/inventario-mensual`);
+  }
 }
 
 export default new Services();
