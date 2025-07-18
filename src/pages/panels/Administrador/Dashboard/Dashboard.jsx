@@ -168,7 +168,7 @@ export function DashboardAdm() {
   }
 
   return (
-    <div className="p-6 min-h-screen text-white">
+    <div className="p-2 min-h-screen text-white">
       <h1 className="text-2xl font-bold mb-6 text-black">
         Home - Punto de Venta AREQUIPA
       </h1>
@@ -189,8 +189,8 @@ export function DashboardAdm() {
 
         <StatCard
           icon={<Settings className="w-6 h-6" />}
-          title="18 Items en mal estado"
-          subtitle="Mantenimiento"
+          title="18 Ventas en el dia"
+          subtitle="Ventas"
         />
       </div>
 
@@ -198,26 +198,26 @@ export function DashboardAdm() {
       <div className="grid grid-cols-4 gap-4 mb-6">
         <MetricCard
           color="text-yellow-400"
-          title="Total Revenue"
+          title="Total Renovación"
           value={new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format(ingresosTotales)}
+          icon={<ChartNoAxesCombined className="w-6 h-6" />}
         />
 
         <MetricCard
           color="text-blue-400"
-          title="Total Expenses"
+          title="Total Ventas"
           value={new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format(totalExpenses)}
-
         />
 
         <MetricCard
           color="text-orange-400"
-          title="Total Customer"
+          title="Clientes Totales"
           value={totalClientes.toLocaleString()}
         />
 
         <MetricCard
           color="text-green-400"
-          title="Total Order"
+          title="Pedidos Totales"
           value={totalVentas}
         />
       </div>
@@ -270,7 +270,7 @@ export function DashboardAdm() {
         {/* Line Chart */}
         <div className="bg-[#27272a] p-4 rounded-lg">
           <h2 className="text-lg font-semibold mb-4">
-            Monthly inventory levels
+            Niveles de Inventario Mensuales
           </h2>
           <ChartContainer config={chartConfig} className="h-64 w-full">
             <LineChart data={inventoryData}>
@@ -314,14 +314,14 @@ function StatCard({ icon, title, subtitle }) {
   );
 }
 
-function MetricCard({ title, value, color }) {
+function MetricCard({ title, value, color , icon}) {
   return (
     <div className="bg-[#27272a] p-4 rounded-lg">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-4">
         <p className={`text-sm ${color}`}>{title}</p>
-        <span className="text-xs text-blue-400">▲ 25%</span>
       </div>
-      <p className="mt-2 text-xl font-bold">{value}</p>
+        <p className="mt-2 text-xl font-bold">{value}</p>
     </div>
+    
   );
 }
