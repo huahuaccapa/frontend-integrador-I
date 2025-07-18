@@ -1,13 +1,12 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   ChartNoAxesCombined,
   AlertTriangle,
   Settings,
   LucideArrowUpRight
 } from "lucide-react";
-
 import {
   Bar,
   BarChart,
@@ -16,14 +15,14 @@ import {
   CartesianGrid,
   XAxis,
   YAxis,
+  Tooltip
 } from "recharts";
-
 import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-
+import ServiceReporte from "@/api/ServiceReporte";
 const inventoryData = [
   { month: "Jan", inventory: 8000 },
   { month: "Feb", inventory: 19000 },
@@ -31,14 +30,6 @@ const inventoryData = [
   { month: "Apr", inventory: 28000 },
   { month: "May", inventory: 40000 },
   { month: "Jun", inventory: 30000 },
-];
-
-const topProductsData = [
-  { product: "Comirnaty", quantity: 120 },
-  { product: "Humira", quantity: 50 },
-  { product: "Spikevax", quantity: 160 },
-  { product: "Keytruda", quantity: 90 },
-  { product: "Eliquis", quantity: 100 },
 ];
 
 const chartConfig = {
@@ -53,6 +44,51 @@ const chartConfig = {
 };
 
 export function DashboardAdm() {
+  const [topProductsData, setTopProductsData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+  const fetchTopProducts = async () => {
+    try {
+      const response = await ServiceReporte.getTopProductosVendidos();
+      // Transformar los datos de formato [["nombre", cantidad]] a {product, quantity}
+      const formattedData = response.data.map(item => ({
+        product: item[0], // Primer elemento es el nombre
+        quantity: item[1]  // Segundo elemento es la cantidad
+      }));
+      setTopProductsData(formattedData);
+    } catch (err) {
+      setError(err.message);
+      console.error("Error fetching top products:", err);
+      // Datos de ejemplo en caso de error
+      setTopProductsData([
+        { product: "Audifonos", quantity: 8 },
+        { product: "ddas", quantity: 5 },
+        { product: "Producto 3", quantity: 4 },
+        { product: "Producto 4", quantity: 3 },
+        { product: "Producto 5", quantity: 2 }
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchTopProducts();
+}, []);
+
+  if (loading) {
+    return <div className="p-6 text-black">Cargando datos...</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="p-6 text-black">
+        Error: {error}. Mostrando datos de ejemplo.
+      </div>
+    );
+  }
+
   return (
     <div className="p-6 min-h-screen text-white">
       <h1 className="text-2xl font-bold mb-6 text-black">
@@ -109,28 +145,49 @@ export function DashboardAdm() {
 
       {/* CHARTS */}
       <div className="grid grid-cols-2 gap-6">
-        {/* Bar Chart */}
-        <div className="bg-[#27272a] p-4 rounded-lg">
-          <h2 className="text-lg font-semibold mb-4">Top 5 productos</h2>
-          <ChartContainer config={chartConfig} className="h-64 w-full">
-            <BarChart data={topProductsData}>
-              <CartesianGrid vertical={false} stroke="#3f3f46" />
-              <XAxis
-                dataKey="product"
-                tick={{ fill: "#a1a1aa", fontSize: 12 }}
-                tickLine={false}
-                axisLine={false}
-              />
-              <ChartTooltip content={<ChartTooltipContent />} />
-              <Bar
-                dataKey="quantity"
-                fill="#84cc16"
-                radius={[4, 4, 0, 0]}
-              />
-            </BarChart>
-          </ChartContainer>
-        </div>
-
+        {/* Bar Chart - Top 5 productos */}
+       <div className="bg-[#27272a] p-4 rounded-lg">
+  <h2 className="text-lg font-semibold mb-4">Top 5 productos más vendidos</h2>
+  <div className="h-[300px]">
+    {topProductsData.length > 0 ? (
+      <BarChart
+        width={500}
+        height={300}
+        data={topProductsData}
+        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+      >
+        <CartesianGrid vertical={false} stroke="#3f3f46" />
+        <XAxis
+          dataKey="product"
+          tick={{ fill: "#a1a1aa", fontSize: 12 }}
+          tickLine={false}
+          axisLine={false}
+        />
+        <YAxis 
+          tick={{ fill: "#a1a1aa", fontSize: 12 }}
+          tickLine={false}
+          axisLine={false}
+        />
+        <Tooltip 
+          contentStyle={{ 
+            backgroundColor: '#3f3f46', 
+            borderColor: '#52525b',
+            color: '#ffffff'
+          }}
+          itemStyle={{ color: '#ffffff' }}
+        />
+        <Bar
+          dataKey="quantity"
+          fill="#84cc16"
+          radius={[4, 4, 0, 0]}
+          animationDuration={1500}
+        />
+      </BarChart>
+    ) : (
+      <p className="text-gray-400">No hay datos disponibles</p>
+    )}
+  </div>
+</div>
         {/* Line Chart */}
         <div className="bg-[#27272a] p-4 rounded-lg">
           <h2 className="text-lg font-semibold mb-4">
@@ -162,8 +219,7 @@ export function DashboardAdm() {
   );
 }
 
-// COMPONENTS
-
+// COMPONENTS (se mantienen igual)
 function StatCard({ icon, title, subtitle }) {
   return (
     <div className="flex items-center justify-between bg-[#27272a] p-4 rounded-lg">

@@ -12,6 +12,11 @@ class VentaService {
   crearVenta(venta) {
     return axios.post(VENTA_BASE_REST_API_URL, venta);
   }
+
+  getTotalVentas() {
+    return axios.get(`${VENTA_BASE_REST_API_URL}/total-ventas`);
+  }
+
 }
 
 export default new VentaService();

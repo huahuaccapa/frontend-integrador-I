@@ -27,6 +27,12 @@ class ServiceReporte {
             }
         });
     }
+
+    // Obtener los 5 productos más vendidos
+    getTopProductosVendidos() {
+        return axios.get(`${API_BASE_URL}/top-productos`);
+    }
+
 }
 
 export default new ServiceReporte();
