@@ -46,6 +46,13 @@ class ServicePedido {
             estado: nuevoEstado
         });
     }
+
+    // 9. Obtener el valor total de los pedidos
+    getValorTotalPedidos() {
+        return axios.get(`${PEDIDO_BASE_REST_API_URL}/valor-total`);
+    }
+
+
 }
 
 export default new ServicePedido();

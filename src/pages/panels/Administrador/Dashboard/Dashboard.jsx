@@ -25,6 +25,7 @@ import {
 import ServiceReporte from "@/api/ServiceReporte";
 import ServiceVentas from "@/api/ServiceVentas";
 import ServiceClientes from "@/api/ServiceClientes";
+import ServicePedido from "@/api/ServicePedido";
 const inventoryData = [
   { month: "Jan", inventory: 8000 },
   { month: "Feb", inventory: 19000 },
@@ -46,6 +47,8 @@ const chartConfig = {
 };
 
 export function DashboardAdm() {
+
+  const [totalExpenses, setTotalExpenses] = useState(0);
   const [topProductsData, setTopProductsData] = useState([]);
   const [totalVentas, setTotalVentas] = useState(0);
   const [totalClientes, setTotalClientes] = useState(0);
@@ -98,6 +101,17 @@ export function DashboardAdm() {
     }
     };
 
+    const fetchTotalExpenses = async () => {
+  try {
+    const response = await ServicePedido.getValorTotalPedidos();
+    setTotalExpenses(response.data); 
+  } catch (err) {
+    console.error("Error al obtener total de gastos (pedidos):", err);
+    setTotalExpenses(0);
+  }
+  };
+
+    fetchTotalExpenses();
     fetchTotalClientes();
     fetchTopProducts();
     fetchTotalVentas();
@@ -154,7 +168,8 @@ export function DashboardAdm() {
         <MetricCard
           color="text-blue-400"
           title="Total Expenses"
-          value="$6,569"
+          value={new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format(totalExpenses)}
+
         />
 
         <MetricCard
