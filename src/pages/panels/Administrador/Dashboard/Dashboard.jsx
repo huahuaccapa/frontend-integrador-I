@@ -52,6 +52,7 @@ export function DashboardAdm() {
   const [topProductsData, setTopProductsData] = useState([]);
   const [totalVentas, setTotalVentas] = useState(0);
   const [totalClientes, setTotalClientes] = useState(0);
+  const [ingresosTotales, setIngresosTotales] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -111,10 +112,21 @@ export function DashboardAdm() {
   }
   };
 
+   const fetchIngresosTotales = async () => {
+    try {
+      const response = await ServiceVentas.getIngresosTotales();
+      setIngresosTotales(response.data);
+    } catch (err) {
+      console.error("Error al obtener ingresos totales:", err);
+      setIngresosTotales(0);
+    }
+  };
+
     fetchTotalExpenses();
     fetchTotalClientes();
     fetchTopProducts();
     fetchTotalVentas();
+    fetchIngresosTotales();
 
 }, []);
 
@@ -162,7 +174,7 @@ export function DashboardAdm() {
         <MetricCard
           color="text-yellow-400"
           title="Total Revenue"
-          value="$36,569"
+          value={new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format(ingresosTotales)}
         />
 
         <MetricCard
