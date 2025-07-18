@@ -23,11 +23,20 @@ class Services {
     return axios.delete(`${PRODUCTO_BASE_REST_API_URL}/${id}`);
   }
 
+  
   obtenerProductosConStockBajo() {
     return axios.get(`${PRODUCTO_BASE_REST_API_URL}/stock-bajo`);
   }
-  
 
+  // 6. Obtener el total de stock
+  getTotalStock() {
+    return axios.get(`${PRODUCTO_BASE_REST_API_URL}/total-stock`);
+  }
+  
+  // 7. Contar productos con stock bajo
+  contarProductosConStockBajo() {
+    return axios.get(`${PRODUCTO_BASE_REST_API_URL}/count/stock-bajo`);
+  }
 }
 
 export default new Services();

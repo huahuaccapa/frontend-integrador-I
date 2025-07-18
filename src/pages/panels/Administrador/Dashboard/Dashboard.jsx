@@ -26,6 +26,7 @@ import ServiceReporte from "@/api/ServiceReporte";
 import ServiceVentas from "@/api/ServiceVentas";
 import ServiceClientes from "@/api/ServiceClientes";
 import ServicePedido from "@/api/ServicePedido";
+import Services from "@/api/Services";
 const inventoryData = [
   { month: "Jan", inventory: 8000 },
   { month: "Feb", inventory: 19000 },
@@ -53,6 +54,8 @@ export function DashboardAdm() {
   const [totalVentas, setTotalVentas] = useState(0);
   const [totalClientes, setTotalClientes] = useState(0);
   const [ingresosTotales, setIngresosTotales] = useState(0);
+  const [totalStock, setTotalStock] = useState(0);
+  const [productosBajoStock, setProductosBajoStock] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -122,11 +125,33 @@ export function DashboardAdm() {
     }
   };
 
+  const fetchTotalStock = async () => {
+    try {
+      const response = await Services.getTotalStock();
+      setTotalStock(response.data);
+    } catch (err) {
+      console.error("Error al obtener total stock:", err);
+      setTotalStock(0);
+    }
+  };
+
+  const fetchProductosBajoStock = async () =>{
+    try{
+      const response = await Services.contarProductosConStockBajo();
+      setProductosBajoStock(response.data);
+    }catch(err){
+      console.error("Error al obtener la cantidad de productos con stock: ",err)
+      setProductosBajoStock(0);
+    }
+  }
+
     fetchTotalExpenses();
     fetchTotalClientes();
     fetchTopProducts();
     fetchTotalVentas();
     fetchIngresosTotales();
+    fetchTotalStock();
+    fetchProductosBajoStock();
 
 }, []);
 
@@ -152,13 +177,13 @@ export function DashboardAdm() {
       <div className="grid grid-cols-3 gap-4 mb-6">
         <StatCard
           icon={<ChartNoAxesCombined className="w-6 h-6" />}
-          title="12,300 Items"
-          subtitle="Productos totales en Stock"
+          title={totalStock}
+          subtitle={"Productos totales en Stock"}
         />
 
         <StatCard
           icon={<AlertTriangle className="w-6 h-6" />}
-          title="51 Bajo Stock"
+          title={productosBajoStock}
           subtitle="Alertas Críticas"
         />
 
