@@ -207,43 +207,6 @@ const exportToXLSX = () => {
 
 
 
-        {/* Rangos de fechas */}
-        <div className="flex gap-5">
-          <div className="bg-white rounded-lg">
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn("w-[240px] justify-start text-left", !startDate && "text-muted-foreground")}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {startDate ? format(startDate, "PPP") : <span>Fecha inicio</span>}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar mode="single" selected={startDate} onSelect={setStartDate} initialFocus />
-              </PopoverContent>
-            </Popover>
-          </div>
-
-          <div className="bg-white rounded-lg">
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn("w-[240px] justify-start text-left", !endDate && "text-muted-foreground")}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {endDate ? format(endDate, "PPP") : <span>Fecha fin</span>}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar mode="single" selected={endDate} onSelect={setEndDate} initialFocus />
-              </PopoverContent>
-            </Popover>
-          </div>
-        </div>
-
         <div>
             <Button className="bg-white text-black font-bold border-4 border-green-500 hover:bg-green-100"
             onClick={exportToXLSX}>Exportar XLSX</Button>
