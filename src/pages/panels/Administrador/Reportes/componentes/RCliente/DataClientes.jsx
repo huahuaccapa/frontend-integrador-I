@@ -115,7 +115,7 @@ export function RCTable() {
       nombre: "Cliente",
       metodoPago: "Método de Pago",
       fechaUltimaCompra: "Fecha de ultima Compra",
-      comprasTotales: "Cantidad de Compras",
+      comprasTotales: "Cant. de Compras",
     };
   
     const dataExport = rows.map((row) => {
@@ -125,7 +125,7 @@ export function RCTable() {
         [headers.nombre]: rowData.nombre,
         [headers.metodoPago]: rowData.metodoPago,
         [headers.fechaUltimaCompra]: rowData.fechaUltimaCompra,
-        [headers.comprasTotales]: rowData.cantidadCompras,
+        [headers.comprasTotales]: rowData.comprasTotales, 
       };
     });
   
